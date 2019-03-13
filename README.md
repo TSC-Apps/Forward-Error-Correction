@@ -1,8 +1,7 @@
-| Niezawodność i Diagnostyka Układów Cyfrowych 2 - Projekt |                                                              |
-| -------------------------------------------------------- | ------------------------------------------------------------ |
-| Prowadzący                                               | dr hab. inż. Henryk Maciejewski                              |
-| Temat                                                    | System FEC (Forward Error Correction)                        |
-| Skład grupy                                              | Tymoteusz Frankiewicz, 241255Filip Mykieta, 229900Szymon Wiśniewski, 241269 |
+| Prowadzący  | dr hab. inż. Henryk Maciejewski                              |
+| ----------- | ------------------------------------------------------------ |
+| Temat       | System FEC (Forward Error Correction)                        |
+| Skład grupy | Tymoteusz Frankiewicz, <br />241255Filip Mykieta, 229900<br />Szymon Wiśniewski, 241269 |
 
  
 

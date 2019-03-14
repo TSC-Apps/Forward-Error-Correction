@@ -1,7 +1,7 @@
 | Prowadzący  | dr hab. inż. Henryk Maciejewski                              |
 | ----------- | ------------------------------------------------------------ |
 | Temat       | System FEC (Forward Error Correction)                        |
-| Skład grupy | Tymoteusz Frankiewicz, <br />241255Filip Mykieta, 229900<br />Szymon Wiśniewski, 241269 |
+| Skład grupy | Tymoteusz Frankiewicz, 241255Filip <br /> Mykieta, 229900<br />Szymon Wiśniewski, 241269 |
 
  
 

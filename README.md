@@ -27,3 +27,25 @@ Celem projektu jest zbudowanie algorytmów korekcyjnych i oszacowanie parametró
 - Implementacja wybranych algorytmów
 - Testowanie poprawności stworzonego programu i optymalizacja
 - Analiza rezultatów
+
+# Notatki z 13 III 2019
+
+- BCH, Reed-Solomon - biblioteki, kilka przykładów kodów nadmiarowych
+  encode, decode
+- badania - eksperyment numeryczny
+  zbudowanie modelu
+- potrajanie bitów - intuicyjny sposób - różne sposoby nadmiarowości
+- kanał - uszkadza bity, np. model Gilberta, model…
+  różne parametry kanału - mniej lub bardziej zaszumiony
+  kody są projektowane pod różne kanały
+  kanały różnią się parametrami - prawdopodobieństwem błędu oraz typem błędu
+- BER kanału: 10-3, 10-8 - stopień zaszumienia
+- wyjście: obserwowana jakość transmisji oraz obniżona prędkość transmisji, zyskujemy jedno, tracimy drugie
+
+
+
+### Na kolejne zajęcia:
+
+- model - w sprawozdaniu
+- biblioteki kodowe - różne rodziny kodów, kodery i dekodery, różne nadmiarowości
+- próbki kodu

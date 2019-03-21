@@ -2,7 +2,7 @@ import random
 
 
 def generate_bits(quantity):
-    arr = []
+    lst = []
     for i in range(0, quantity):
-        arr.append(random.randint(0, 1))
-    return arr
+        lst.append(random.randint(0, 1))
+    return lst

@@ -1,6 +1,5 @@
-from generator import generate_bits
 
-
+#koder potrajający bit
 def triple_code(lst):
     coded_lst = []
     for i in lst:
@@ -8,11 +7,3 @@ def triple_code(lst):
             coded_lst.append(i)
 
     return coded_lst
-
-
-quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
-
-lst = generate_bits(quantity)
-coded_lst = triple_code(lst)
-print(lst)
-print(coded_lst)

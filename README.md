@@ -30,10 +30,10 @@ Celem projektu jest zbudowanie algorytmów korekcyjnych i oszacowanie parametró
 
 # Notatki z 13 III 2019
 
-- BCH, Reed-Solomon - biblioteki, kilka przykładów kodów nadmiarowych
-  encode, decode
-- badania - eksperyment numeryczny
-  zbudowanie modelu
+- BCH - <https://github.com/jkrauze/bch> 
+-  Reed-Solomon - <https://pypi.org/project/reedsolo/>
+  - biblioteki, kilka przykładów kodów nadmiarowych encode, decode
+- badania - eksperyment numeryczny zbudowanie modelu
 - potrajanie bitów - intuicyjny sposób - różne sposoby nadmiarowości
 - kanał - uszkadza bity, np. model Gilberta, model…
   różne parametry kanału - mniej lub bardziej zaszumiony

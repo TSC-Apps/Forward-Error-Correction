@@ -1,5 +1,4 @@
-
-#koder potrajający bit
+# koder potrajający bit
 def triple_code(lst):
     coded_lst = []
     for i in lst:

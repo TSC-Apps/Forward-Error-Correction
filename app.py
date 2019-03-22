@@ -3,6 +3,17 @@ from decoder import decode
 from coder import triple_code
 from canal import bsc
 
+
+# bit error rate przesylanego ciagu input i odebranego output
+def ber(input, output):
+    wrong_bits = 0
+
+    for i in range(len(input)):
+        wrong_bits += (input[i] ^ output[i])
+
+    return wrong_bits / len(input)
+
+
 quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
 
 # generacja
@@ -20,4 +31,4 @@ print(f"Ciąg po przejsciu przez kanał:\t {output}")
 # dekodowanie
 decoded_lst = decode(output)
 print(f"Odkodowany ciąg:\t\t\t\t {decoded_lst}")
-print(f"BER: {wrongBits / len(coded_lst)}") #BER ma sie odnosic do zakodowanej czy nie zakodowanej liczby?
+print(f"BER: {ber(lst, decoded_lst)}")  # BER ma sie odnosic do zakodowanej czy nie zakodowanej liczby?

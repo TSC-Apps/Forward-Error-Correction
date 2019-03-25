@@ -109,13 +109,13 @@ Biblioteka
 
 #### Kod Hamminga
 
-Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga między słowami tranmitowanymi i odbieranymi powinna wynosić 0 lub 1. 
-
-Bity parzystości - pozycje, które są potęgami dwójki - 1, 2, 4, 8, 16...
+Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2 - 1, 2, 4, 8, 16...
 
 
 
-TODO obejrzeć
+TODO zapoznać się z:
+
+<https://www.geeksforgeeks.org/computer-network-hamming-code/>
 
 <https://www.youtube.com/watch?v=373FUw-2U2k>
 

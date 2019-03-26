@@ -99,11 +99,41 @@ Przykład:
 
 #### Kod BCH (Bose-Chaudhuri-Hocquenghema)
 
-Kody cykliczne, czyli wielomianowe o długości słowa kodowego n, których wielomian generujący g(x) jest dzielnikiem wielomianu x<sup>n</sup>+1.
+Kody cykliczne, czyli wielomianowe o długości słowa kodowego n, których wielomian generujący g(x) jest dzielnikiem wielomianu x<sup>n</sup>+1, o zmiennej długości, służące do korekcji błędów losowych, w przybliżeniu do 25% całkowitej liczby cyfr.
 
-Biblioteka
+Istnieje wielomian k(x) stopnia k, że
+
+> g(x)k(x) = x<sup>n</sup> + 1
+
+lub
+
+> (x<sup>n</sup>+1)modg(x) = 0
+
+Dla każdej liczby całkowitej m i t < 2<sup>m-1</sup> istnieje kod bch o długości n = 2<sup>m</sup> - 1. Może on korygować do t błędów i ma nie więcej niż m*t elementów kontrolnych.
+
+
+
+> n = 2<sup>m</sup> - 1
+>
+> k >= n - m*t
+>
+> d<sub>min</sub> >= 2t + 1
+
+
+
+gdzie: 
+n - długość wektora kodowego,
+k - długość ciągu informacyjnego,
+d - odległość minimalna,
+t - zdolność korekcji błędów.
+
+
+
+Biblioteki:
 
 > <https://github.com/jkrauze/bch>
+>
+> <https://github.com/jkent/python-bchlib>
 
 
 
@@ -113,7 +143,13 @@ Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodat
 
 
 
-TODO zapoznać się z:
+Biblioteka:
+
+> <https://pypi.org/project/libhamming/>
+
+
+
+**TODO** zapoznać się z:
 
 <https://www.geeksforgeeks.org/computer-network-hamming-code/>
 
@@ -123,17 +159,27 @@ TODO zapoznać się z:
 
 #### Kod Reed-Solomona
 
-Biblioteka:
+Biblioteki:
 
 > <https://pypi.org/project/reedsolo/>>
+>
+> <https://pypi.org/project/unireedsolomon/>
+>
+> <https://github.com/vivint/infectious>
 
 
 
-#### Model Gilberta
+**TODO** zapoznać się z:
+
+> <https://www.academia.edu/31243287/Reed_Solomon_Encoding_Simplified_Explanation_for_Programmers>
 
 
 
 
+
+Ogólne biblioteki do sprawdzenia: 
+
+<https://pypi.org/project/zfec/>
 
 
 

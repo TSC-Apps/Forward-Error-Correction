@@ -1,7 +1,7 @@
 from generator import generate_bits
 from decoder import decode
 from triple_coder import triple_code
-from bsc import bsc
+from channels import bsc, gilbert
 from ber import ber
 import hamming
 

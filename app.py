@@ -1,17 +1,9 @@
 from generator import generate_bits
 from decoder import decode
 from coder import triple_code
-from canal import bsc
-
-
-# bit error rate przesylanego ciagu input i odebranego output
-def ber(input, output):
-    wrong_bits = 0
-
-    for i in range(len(input)):
-        wrong_bits += (input[i] ^ output[i])
-
-    return wrong_bits / len(input)
+from bsc import bsc, bsc_mtrx
+from ber import ber
+import numpy as np
 
 
 quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
@@ -25,7 +17,7 @@ coded_lst = triple_code(lst)
 print(f"Zakodowany ciąg:\t\t\t\t {coded_lst}")
 
 # przepusczenie przez kanał
-output, wrongBits = bsc(coded_lst, 0.2)
+output = bsc(coded_lst, 0.2)
 print(f"Ciąg po przejsciu przez kanał:\t {output}")
 
 # dekodowanie

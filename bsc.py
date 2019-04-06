@@ -12,7 +12,7 @@ def bsc(input_word, p):  #binary symmetric channel; p to prawdopodobieństwo prz
                 output_word.append(0)
         else:
             output_word.append(bit)
-    return output_word
+    return np.array(output_word)
 
 
 def bsc_mtrx(input_matrix, p):

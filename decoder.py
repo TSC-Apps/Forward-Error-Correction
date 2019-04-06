@@ -1,7 +1,7 @@
 from collections import Counter
 
 
-# dekoder dekodujący bity ktory przyszły z kanały
+# dekoder dekodujący bity, ktore przyszły z kanału
 def decode(lst):
     dec_lst = []
 

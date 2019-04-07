@@ -3,9 +3,9 @@ from numpy import array
 
 
 # dekoder dekodujący bity, ktore przyszły z kanału
-def decode_triple(lst):
+def decode_triple(arr):
     dec_lst = []
-
+    lst = arr[0]
     for i in range(0, len(lst), 3):
         counter = Counter()
         for j in range(0, 3):
@@ -20,7 +20,7 @@ def decode_triple(lst):
 
 
 def code_triple(lst):
-    return array([i for i in lst for j in range(0, 3)])
+    return array([[i for i in lst for j in range(0, 3)]])
 
 
 def ber_triple(input, output):

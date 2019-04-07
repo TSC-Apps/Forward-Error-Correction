@@ -30,6 +30,7 @@ output_hamming = bsc(hamming_encoded, 0.2)
 print(f"Ciag po przejsciu przez kanal: {output_hamming}")
 hamming_decoded = hamming.decode(output_hamming)
 print(f"Odkodowany ciąg: {hamming_decoded}")
+print(f"BER: {ber_triple(lst, hamming_decoded)}")
 
 #bit error rate danych dwoch ciagow
 

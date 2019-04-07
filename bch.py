@@ -1,5 +1,4 @@
 import bchlib
-import os
 
 
 class BCH:
@@ -11,6 +10,8 @@ class BCH:
         self.obj = bchlib.BCH(self.bch_polynomial, self.bch_bits)
 
     def encode(self, data):
+        data = bytearray(data)
+
         # zakodowanie ciagu danych
         data_enc = self.obj.encode(data)
 
@@ -37,19 +38,15 @@ class BCH:
 
 # przykladowe dzialanie:
 obj = BCH(8219, 16)  # bch_polynomial, bch_bits
-length = 12
 
-# wygenerowanie ciagu danych (bytearray) o odpowiedniej dlugosci
-b_data = bytearray(os.urandom(length))
-b_enc = obj.encode(b_data)
+code = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0]
+b_enc = obj.encode(code)
 b_dec = obj.decode(b_enc)
 
-# wyswietlenie w formie bytearray
-print('\nData:      ', b_data)
-print('Encoded:   ', b_enc)
+print('\nData:      ', code)
+print('=======================================================\nEncoded packet:   ', b_enc)
 print('Decoded:   ', b_dec)
 
-# wyswietlenie w formie listy
-print('\nData:      ', list(b_data))
-print('Encoded:   ', list(b_enc))
+print('=======================================================')
+print('Encoded packet:   ', list(b_enc))
 print('Decoded:   ', list(b_dec))

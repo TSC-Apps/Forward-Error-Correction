@@ -26,7 +26,9 @@ print('\nKodowanie Hamminga')
 print(f"Przykładowy ciąg:{lst}")
 hamming_encoded = hamming.encode(lst)
 print(f"Zakodowany ciąg: {hamming_encoded}")
-hamming_decoded = hamming.decode(hamming_encoded)
+output_hamming = bsc(hamming_encoded, 0.2)
+print(f"Ciag po przejsciu przez kanal: {output_hamming}")
+hamming_decoded = hamming.decode(output_hamming)
 print(f"Odkodowany ciąg: {hamming_decoded}")
 
 #bit error rate danych dwoch ciagow

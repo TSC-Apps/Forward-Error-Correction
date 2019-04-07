@@ -1,8 +1,9 @@
 from collections import Counter
+from numpy import array
 
 
 # dekoder dekodujący bity, ktore przyszły z kanału
-def decode(lst):
+def decode_triple(lst):
     dec_lst = []
 
     for i in range(0, len(lst), 3):
@@ -16,3 +17,16 @@ def decode(lst):
         counter.clear()
 
     return dec_lst
+
+
+def code_triple(lst):
+    return array([i for i in lst for j in range(0, 3)])
+
+
+def ber_triple(input, output):
+    wrong_bits = 0
+
+    for i in range(len(input)):
+        wrong_bits += (input[i] ^ output[i])
+
+    return wrong_bits / len(input)

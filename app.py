@@ -2,6 +2,7 @@ from generator import generate_bits
 from triple_code import code_triple, decode_triple, ber_triple
 from channels import bsc, gilbert
 import hamming
+# import bch
 
 quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
 
@@ -34,7 +35,7 @@ decoded_lst2 = decode_triple(output2)
 print(f"Odkodowany ciąg po przejściu przez kanał Gilberta:{decoded_lst2}")
 print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, decoded_lst2)}")
 
-
+print('\n===========================================================================')
 
 print('\nKodowanie Hamminga\n')
 print(f"Przykładowy ciąg:{lst}")
@@ -55,6 +56,32 @@ hamming_decoded2 = hamming.decode(output_hamming2)
 print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {hamming_decoded2}")
 print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, hamming_decoded2)}\n")
 
+
+# BCH nie działa, bo generuje niebinarny ciag
+# print('\n===========================================================================')
+#
+# print('\nKodowanie BCH\n')
+#
+# bch_obj = bch.BCH(8219, 16)  # bch_polynomial, bch_bits
+#
+# bch_encoded = bch_obj.encode(lst)
+#
+# print(f"Przykładowy ciąg:{lst}")
+# print(f"Zakodowany ciąg: {bch_encoded}\n")
+#
+# # przepuszczenie przez kanał BSC
+# output_bch = bsc(bch_encoded, 0.01)
+# print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
+# bch_decoded = bch_obj.decode(output_bch)
+# print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
+# print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
+#
+# # przepuszczenie przez kanał Gilberta
+# output_bch2 = gilbert(bch_encoded, 0.02, 0.25)
+# print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
+# bch_decoded2 = bch_obj.decode(output_bch2)
+# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
+# print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
 
 
 #bit error rate danych dwoch ciagow

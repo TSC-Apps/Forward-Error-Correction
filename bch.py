@@ -1,4 +1,5 @@
 import bchlib
+import numpy as np
 
 
 class BCH:
@@ -18,7 +19,7 @@ class BCH:
 
         # utworzenie pakietu
         packet = data + data_enc
-        return list(packet)
+        return np.array([packet])
 
     def decode(self, packet):
         # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
@@ -35,18 +36,6 @@ class BCH:
             # data_enc = decoded[2]
             data_dec = decoded[1]
 
-            return list(data_dec)
+            return np.array([data_dec])
         except:
             print('Nie udalo sie odkodowac ciagu danych.')
-
-
-# przykladowe dzialanie:
-obj = BCH(8219, 16)  # bch_polynomial, bch_bits
-
-code = [0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0]
-b_enc = obj.encode(code)
-b_dec = obj.decode(b_enc)
-
-print('\nData:      ', code)
-print('Encoded packet:   ', b_enc)
-print('Decoded:   ', b_dec)

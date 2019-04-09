@@ -1,11 +1,14 @@
 import bchlib
 import numpy as np
-
+import generator
+import random
+import os
 
 class BCH:
     def __init__(self, p=8219, b=16):
         self.bch_polynomial = p
         self.bch_bits = b
+        self.bitflips = 0
 
         # utworzenie obiektu klasy z biblioteki bchlib
         self.obj = bchlib.BCH(self.bch_polynomial, self.bch_bits)
@@ -19,7 +22,7 @@ class BCH:
 
         # utworzenie pakietu
         packet = data + data_enc
-        return np.array([packet])
+        return np.array(packet)
 
     def decode(self, packet):
         # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
@@ -32,10 +35,48 @@ class BCH:
         try:
             decoded = self.obj.decode(data, data_enc)
 
-            # bitflips = decoded[0]
-            # data_enc = decoded[2]
+            self.bitflips = decoded[0]
             data_dec = decoded[1]
+            # data_enc = decoded[2]
 
-            return np.array([data_dec])
+            return np.array(data_dec)
         except:
             print('Nie udalo sie odkodowac ciagu danych.')
+
+
+BCH_POLYNOMIAL = 8219
+BCH_BITS = 160
+
+bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
+
+#data = generator.generate_bits(90)
+data = list(os.urandom(10))
+encoded = bch.encode(data)
+
+print(f'\nData:                      {data}')
+print(f'Encoded (before channel):  {list(encoded)}')
+
+# coś w rodzaju kanału
+def bitflip(packet):
+    byte_num = random.randint(0, len(packet) - 1)
+    bit_num = random.randint(0, 7)
+    # packet[byte_num] = packet[byte_num] ^ (1 << bit_num)     ; xor, left bitshift
+    packet[byte_num] ^= (1 << bit_num)
+
+
+# bitflip bedzie zrobiony BCH_BITS razy
+for _ in range(BCH_BITS):
+    bitflip(encoded)
+
+print(f'Encoded (after channel):   {list(encoded)}')
+
+# odkodowanie
+decoded = bch.decode(encoded)
+
+print(f'Decoded:                   {list(decoded)}')
+print(f'\nBitflips: {bch.bitflips}\n')
+
+if data == list(decoded):
+    print('Odkodowany w 100% poprawnie')
+else:
+    print('Nie udalo sie odkodować w 100% poprawnie.')

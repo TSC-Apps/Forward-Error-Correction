@@ -49,34 +49,58 @@ BCH_BITS = 160
 
 bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
 
-#data = generator.generate_bits(90)
-data = list(os.urandom(10))
+data = generator.generate_bits(10)
+# data = list(os.urandom(10))
 encoded = bch.encode(data)
 
-print(f'\nData:                      {data}')
-print(f'Encoded (before channel):  {list(encoded)}')
 
-# coś w rodzaju kanału
-def bitflip(packet):
-    byte_num = random.randint(0, len(packet) - 1)
-    bit_num = random.randint(0, 7)
-    # packet[byte_num] = packet[byte_num] ^ (1 << bit_num)     ; xor, left bitshift
-    packet[byte_num] ^= (1 << bit_num)
+# TODO w zasadzie wystarczy zamieniac tylko liczby kontrolne, czyli dopiero te po dlugosci ciagu do zakodowania
+def prepareForChannel(lst):
+    s = ''
+    for number in lst:
+        a = bin(number).split('b')[1]
+        if len(a) < 8:
+            for _ in range(8 - len(a)):
+                a = '0' + str(a)
+        s += a
+    l = list(s)
+    l2 = []
+    for each in l:
+        each = int(each)
+        l2.append(each)
+    return np.array(l2)
+
+print(f'\nData:                                           {data}')
+print(f'Encoded (before channel):                       {list(encoded)}')
+print(f'Encoded (before channel, every number 8 bits):  {list(prepareForChannel(encoded))}')
 
 
-# bitflip bedzie zrobiony BCH_BITS razy
-for _ in range(BCH_BITS):
-    bitflip(encoded)
+# TODO pracowac na np.ndarray
 
-print(f'Encoded (after channel):   {list(encoded)}')
 
-# odkodowanie
-decoded = bch.decode(encoded)
+# # coś w rodzaju kanału
+# def bitflip(packet):
+#     byte_num = random.randint(0, len(packet) - 1)
+#     bit_num = random.randint(0, 7)
+#     # packet[byte_num] = packet[byte_num] ^ (1 << bit_num)     ; xor, left bitshift
+#     packet[byte_num] ^= (1 << bit_num)
+#
+#
+# # bitflip bedzie zrobiony BCH_BITS razy
+# for _ in range(BCH_BITS):
+#     bitflip(encoded)
+#
+# print(f'Encoded (after channel):   {list(encoded)}')
+#
+# # odkodowanie
+# decoded = bch.decode(encoded)
+#
+# print(f'Decoded:                   {list(decoded)}')
+# print(f'\nBitflips: {bch.bitflips}\n')
+#
+# if data == list(decoded):
+#     print('Odkodowany w 100% poprawnie')
+# else:
+#     print('Nie udalo sie odkodować w 100% poprawnie.')
 
-print(f'Decoded:                   {list(decoded)}')
-print(f'\nBitflips: {bch.bitflips}\n')
 
-if data == list(decoded):
-    print('Odkodowany w 100% poprawnie')
-else:
-    print('Nie udalo sie odkodować w 100% poprawnie.')

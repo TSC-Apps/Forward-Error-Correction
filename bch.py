@@ -54,15 +54,20 @@ data = generator.generate_bits(10)
 encoded = bch.encode(data)
 
 
-# TODO w zasadzie wystarczy zamieniac tylko liczby kontrolne, czyli dopiero te po dlugosci ciagu do zakodowania
-def prepareForChannel(lst):
+# formatowane sa dopiero liczby kontrolne
+def prepareForChannel(init, enc):
     s = ''
-    for number in lst:
-        a = bin(number).split('b')[1]
+    for number in init:
+        s += str(number)
+    i = len(init)
+    while i < len(enc):
+        a = bin(enc[i]).split('b')[1]
+        # TODO rozwazyc sens tego - przydatne bardzo w kontekscie dekodowania, bo wiem ze kazda liczba ma 8 bitow, ale zwieksza prawdopodobienstwo skale przeklaman po przejsciu przez kanal (?)
         if len(a) < 8:
             for _ in range(8 - len(a)):
                 a = '0' + str(a)
         s += a
+        i += 1
     l = list(s)
     l2 = []
     for each in l:
@@ -70,10 +75,9 @@ def prepareForChannel(lst):
         l2.append(each)
     return np.array(l2)
 
-print(f'\nData:                                           {data}')
-print(f'Encoded (before channel):                       {list(encoded)}')
-print(f'Encoded (before channel, every number 8 bits):  {list(prepareForChannel(encoded))}')
-
+print(f'\nData:                      {data}')
+print(f'Encoded (before channel):  {list(encoded)}')
+print(f'Encoded (before channel):  {list(prepareForChannel(data, encoded))}')
 
 # TODO pracowac na np.ndarray
 

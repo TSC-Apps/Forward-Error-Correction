@@ -14,8 +14,20 @@ def dec_to_bin(lst):
     return bin_matrix_int
 
 
-rs = reedsolo.RSCodec(10)
+def bin_to_dec(bin_matrix):
+    dec_list = []
 
-x = dec_to_bin(list(rs.encode([1, 0, 1, 0, 1])))
-y = np.array([np.array(xi) for xi in x])
-pprint.pprint(np.asarray(y))
+    for bin_list in bin_matrix:
+        temp = [str(bin_element) for bin_element in bin_list]
+        temp = ''.join(temp)
+        dec_list.append(temp)
+    return [int(number, 2) for number in dec_list]
+
+
+rs = reedsolo.RSCodec(10)
+encoded = rs.encode([1, 0, 1, 0, 1])
+prepared_for_channel = dec_to_bin(list(encoded))
+decoded = bin_to_dec(prepared_for_channel)
+
+pprint.pprint(encoded)
+pprint.pprint(bytearray(decoded))

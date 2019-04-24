@@ -1,7 +1,9 @@
 from generator import generate_bits
 from triple_code import code_triple, decode_triple, ber_triple
+from reed_solomon import dec_to_bin, bin_to_dec
 from channels import bsc, gilbert, bsc_lists, gilbert_lists
 import hamming
+import reedsolo
 # import bch
 
 quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
@@ -88,6 +90,31 @@ print(gilbert_lists(x, 0.5, 0.5, 0.5, 0.5))
 # print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
 # print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
 
+
+print('\n===========================================================================')
+print('Kodowanie Reeda-Solomona')
+print(f"Przykładowy ciąg: {lst}")
+
+rs = reedsolo.RSCodec(10)
+encoded = rs.encode(lst)
+
+print(f"Zakodowany ciąg: {encoded}")
+
+prepared_for_channel = dec_to_bin(list(encoded))
+
+print(f"Zbinaryzowany zakodowany ciąg: {prepared_for_channel}")
+
+bsc_lists(prepared_for_channel, 0.5)
+
+print(f"Zbinaryzowany ciąg po przejsciu przez kanał: {prepared_for_channel}")
+
+decoded = bin_to_dec(prepared_for_channel)
+
+print(f"Bitarray po przejsciu przez kanal: {bytearray(decoded)}")
+
+message = rs.decode(decoded)
+
+print(f"Zdekodowana wiadomosc: {list(message)}")
 
 #bit error rate danych dwoch ciagow
 

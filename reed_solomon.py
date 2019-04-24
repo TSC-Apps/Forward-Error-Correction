@@ -24,10 +24,11 @@ def bin_to_dec(bin_matrix):
     return [int(number, 2) for number in dec_list]
 
 
-rs = reedsolo.RSCodec(10)
-encoded = rs.encode([1, 0, 1, 0, 1])
-prepared_for_channel = dec_to_bin(list(encoded))
-decoded = bin_to_dec(prepared_for_channel)
+if __name__ == '__main__':
+    rs = reedsolo.RSCodec(10)
+    encoded = rs.encode([1, 0, 1, 0, 1])
+    prepared_for_channel = dec_to_bin(list(encoded))
+    decoded = bin_to_dec(prepared_for_channel)
 
-pprint.pprint(encoded)
-pprint.pprint(bytearray(decoded))
+    pprint.pprint(encoded)
+    pprint.pprint(bytearray(decoded))

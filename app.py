@@ -104,11 +104,11 @@ prepared_for_channel = dec_to_bin(list(encoded))
 
 print(f"Zbinaryzowany zakodowany ciąg: {prepared_for_channel}")
 
-bsc_lists(prepared_for_channel, 0.5)
+after_channel = bsc_lists(prepared_for_channel, 0.1)
 
-print(f"Zbinaryzowany ciąg po przejsciu przez kanał: {prepared_for_channel}")
+print(f"Zbinaryzowany ciąg po przejsciu przez kanał: {after_channel}")
 
-decoded = bin_to_dec(prepared_for_channel)
+decoded = bin_to_dec(after_channel)
 
 print(f"Bitarray po przejsciu przez kanal: {bytearray(decoded)}")
 

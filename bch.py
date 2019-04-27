@@ -1,4 +1,6 @@
 import bchlib
+from reed_solomon import dec_to_bin
+from reed_solomon import bin_to_dec
 import numpy as np
 import generator
 import random
@@ -22,9 +24,15 @@ class BCH:
 
         # utworzenie pakietu
         packet = data + data_enc
-        return np.array(packet)
+
+        lst = dec_to_bin(list(packet))
+
+        return lst
 
     def decode(self, packet):
+        # konwersja binary -> dec
+        packet = bin_to_dec(packet)
+
         # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
         packet = bytearray(packet)
 
@@ -39,72 +47,22 @@ class BCH:
             data_dec = decoded[1]
             # data_enc = decoded[2]
 
-            return np.array(data_dec)
+            return list(data_dec)
         except:
             print('Nie udalo sie odkodowac ciagu danych.')
 
 
-BCH_POLYNOMIAL = 8219
-BCH_BITS = 160
-
-bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
-
-data = generator.generate_bits(10)
-# data = list(os.urandom(10))
-encoded = bch.encode(data)
-
-
-# formatowane sa dopiero liczby kontrolne
-def prepareForChannel(init, enc):
-    s = ''
-    for number in init:
-        s += str(number)
-    i = len(init)
-    while i < len(enc):
-        a = bin(enc[i]).split('b')[1]
-        # TODO rozwazyc sens tego - przydatne bardzo w kontekscie dekodowania, bo wiem ze kazda liczba ma 8 bitow, ale zwieksza prawdopodobienstwo skale przeklaman po przejsciu przez kanal (?)
-        if len(a) < 8:
-            for _ in range(8 - len(a)):
-                a = '0' + str(a)
-        s += a
-        i += 1
-    l = list(s)
-    l2 = []
-    for each in l:
-        each = int(each)
-        l2.append(each)
-    return np.array(l2)
-
-print(f'\nData:                      {data}')
-print(f'Encoded (before channel):  {list(encoded)}')
-print(f'Encoded (before channel):  {list(prepareForChannel(data, encoded))}')
-
-# TODO pracowac na np.ndarray
-
-
-# # coś w rodzaju kanału
-# def bitflip(packet):
-#     byte_num = random.randint(0, len(packet) - 1)
-#     bit_num = random.randint(0, 7)
-#     # packet[byte_num] = packet[byte_num] ^ (1 << bit_num)     ; xor, left bitshift
-#     packet[byte_num] ^= (1 << bit_num)
+# BCH_POLYNOMIAL = 8219
+# BCH_BITS = 160
 #
+# bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
 #
-# # bitflip bedzie zrobiony BCH_BITS razy
-# for _ in range(BCH_BITS):
-#     bitflip(encoded)
+# data = generator.generate_bits(10)
+# # data = list(os.urandom(10))
+# print(f'\nData:                      {data}')
 #
-# print(f'Encoded (after channel):   {list(encoded)}')
+# encoded = bch.encode(data)
+# print(f'Encoded (before channel):  {encoded}')
 #
-# # odkodowanie
 # decoded = bch.decode(encoded)
-#
-# print(f'Decoded:                   {list(decoded)}')
-# print(f'\nBitflips: {bch.bitflips}\n')
-#
-# if data == list(decoded):
-#     print('Odkodowany w 100% poprawnie')
-# else:
-#     print('Nie udalo sie odkodować w 100% poprawnie.')
-
-
+# print(f'Decoded:                   {decoded}')

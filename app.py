@@ -4,7 +4,7 @@ from reed_solomon import dec_to_bin, bin_to_dec
 from channels import bsc, gilbert, bsc_lists, gilbert_lists
 import hamming
 import reedsolo
-# import bch
+import bch
 
 quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
 
@@ -63,35 +63,34 @@ x = [[0, 1, 1], [1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]
 print(bsc_lists(x, 0.5))
 print(gilbert_lists(x, 0.5, 0.5, 0.5, 0.5))
 
+print('\n===========================================================================')
 
-# BCH nie działa, bo generuje niebinarny ciag
-# print('\n===========================================================================')
-#
-# print('\nKodowanie BCH\n')
-#
-# bch_obj = bch.BCH(8219, 16)  # bch_polynomial, bch_bits
-#
-# bch_encoded = bch_obj.encode(lst)
-#
-# print(f"Przykładowy ciąg:{lst}")
-# print(f"Zakodowany ciąg: {bch_encoded}\n")
-#
-# # przepuszczenie przez kanał BSC
-# output_bch = bsc(bch_encoded, 0.01)
-# print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
-# bch_decoded = bch_obj.decode(output_bch)
-# print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
-# print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
-#
-# # przepuszczenie przez kanał Gilberta
-# output_bch2 = gilbert(bch_encoded, 0.02, 0.25)
-# print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
-# bch_decoded2 = bch_obj.decode(output_bch2)
-# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
-# print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
+print('\nKodowanie BCH\n')
+
+bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
+
+bch_encoded = bch_obj.encode(lst)
+
+print(f"Przykładowy ciąg:{lst}")
+print(f"Zakodowany ciąg: {bch_encoded}\n")
+
+# przepuszczenie przez kanał BSC
+output_bch = bsc_lists(bch_encoded, 0.5)
+print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
+bch_decoded = bch_obj.decode(output_bch)
+print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
+print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
+
+# przepuszczenie przez kanał Gilberta
+output_bch2 = gilbert_lists(bch_encoded, 0.22, 0.02, 0.65, 0.55)
+print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
+bch_decoded2 = bch_obj.decode(output_bch2)
+print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
+print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
 
 
 print('\n===========================================================================')
+
 print('Kodowanie Reeda-Solomona')
 print(f"Przykładowy ciąg: {lst}")
 

@@ -3,115 +3,102 @@ from triple_code import code_triple, decode_triple, ber_triple
 from reed_solomon import dec_to_bin, bin_to_dec
 from channels import bsc, gilbert, bsc_lists, gilbert_lists
 import hamming
+import matplotlib.pyplot as plt
 import unireedsolomon
 
-quantity = int(input('Podaj ilosc bitow informacji do wygenerowania: '))
+quantity_parameters = [200000, 400000, 600000, 800000, 1000000]
 
-# idealny
-# error_probability = 0.000096854
+bsc_parameters = [0.000096854, 0.00096854, 0.0096854, 0.096854, 0.96854]
+gilbert_parameters = [(0.000001, 0.000101648, 0.31, 0.914789), (0.000053513, 0.000196854, 0.65, 0.509547),
+                      (0.0003631513, 0.000396854, 0.9, 0.2768), (0.0003631513, 0.00496854, 0.99999, 0.04)]
 
-# dobry
-# error_probability = 0.00096854
+for error_probability in bsc_parameters:
+    ber_list = []
+    for quantity in quantity_parameters:
+        lst = generate_bits(quantity)
+        coded_lst = code_triple(lst)
+        output = bsc(coded_lst, error_probability)
+        decoded_lst = decode_triple(output)
+        ber_list.append(ber_triple(lst, decoded_lst))
 
-# zły
-# error_probability = 0.0096854
+    plt.clf()
+    plt.plot(quantity_parameters, ber_list)
+    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.xlabel('Dlugosc wiadomosci')
+    plt.ylabel('BER')
+    plt.savefig('tripling_code_bsc_ber_err_prob=' + str(error_probability) + '.png')
 
-# fatalny
-# error_probability = 0.096854
+for parameter_list in gilbert_parameters:
+    ber_list = []
+    for quantity in quantity_parameters:
+        lst = generate_bits(quantity)
+        coded_lst = code_triple(lst)
+        output2 = gilbert(coded_lst, *parameter_list)
+        decoded_lst2 = decode_triple(output2)
+        ber_list.append(ber_triple(lst, decoded_lst2))
 
-# chujowy
-error_probability = 0.96854
+    plt.clf()
+    plt.plot(quantity_parameters, ber_list)
+    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.xlabel('Dlugosc wiadomosci')
+    plt.ylabel('BER')
+    plt.savefig('tripling_code_gilbert_ber_err_prob=' + str(parameter_list) + '.png')
 
-# idealny
-# p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good = 0.000001, 0.000101648, 0.31, 0.914789
+# Kodowanie Hamminga\
+for error_probability in bsc_parameters:
+    ber_list = []
+    for quantity in quantity_parameters:
+        lst = generate_bits(quantity)
+        hamming_encoded = hamming.encode(lst)
+        output_hamming = bsc(hamming_encoded, error_probability)
+        hamming_decoded = hamming.decode(output_hamming)
+        ber_list.append(ber_triple(lst, hamming_decoded))
 
-# dobry
-# p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good = 0.000053513, 0.000196854, 0.65, 0.509547
+    plt.clf()
+    plt.plot(quantity_parameters, ber_list)
+    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.xlabel('Dlugosc wiadomosci')
+    plt.ylabel('BER')
+    plt.savefig('hamming_bsc_ber_err_prob=' + str(error_probability) + '.png')
 
-# zły
-# p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good = 0.0003631513, 0.000396854, 0.9, 0.2768
+for parameter_list in gilbert_parameters:
+    ber_list = []
+    for quantity in quantity_parameters:
+        lst = generate_bits(quantity)
+        hamming_encoded = hamming.encode(lst)
+        output_hamming2 = gilbert(hamming_encoded, *parameter_list)
+        hamming_decoded2 = hamming.decode(output_hamming2)
+        ber_list.append(ber_triple(lst, hamming_decoded2))
 
-# fatalny
-# p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good = 0.0003631513, 0.00496854, 0.99999, 0.04
+    plt.clf()
+    plt.plot(quantity_parameters, ber_list)
+    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.xlabel('Dlugosc wiadomosci')
+    plt.ylabel('BER')
+    plt.savefig('hamming_gilbert_ber_err_prob=' + str(parameter_list) + '.png')
 
-# chujowy
-p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good = 0.003631513, 0.0396854, 0.99999, 0.004
-
-print('\nKodowanie z potrajaniem\n')
-# generacja
-lst = generate_bits(quantity)
+# print('\nKodowanie BCH\n')
+#
+# bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
+#
+# bch_encoded = bch_obj.encode(lst)
+#
 # print(f"Przykładowy ciąg:{lst}")
-
-# kodowanie
-coded_lst = code_triple(lst)
-# print(f"Zakodowany ciąg:{coded_lst}\n")
-
-# przepusczenie przez kanał BSC
-output = bsc(coded_lst, error_probability)
-# print(f"Ciąg po przejsciu przez kanał BSC: {output}")
-
-# dekodowanie
-decoded_lst = decode_triple(output)
-# print(f"Odkodowany ciąg po przejściu przez kanał BSC:{decoded_lst}")
-print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, decoded_lst)}\n")
-
-# przepuszczenie przez kanał Gilberta
-output2 = gilbert(coded_lst, p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad, p_of_bad_to_good)
-# print(f"Ciąg po przejsciu przez kanał Gilberta: {output2}")
-
-# dekodowanie
-decoded_lst2 = decode_triple(output2)
-# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta:{decoded_lst2}")
-print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, decoded_lst2)}")
-
-print('\n===========================================================================')
-
-print('\nKodowanie Hamminga\n')
-# print(f"Przykładowy ciąg:{lst}")
-hamming_encoded = hamming.encode(lst)
-# print(f"Zakodowany ciąg: {hamming_encoded}\n")
+# print(f"Zakodowany ciąg: {bch_encoded}\n")
 
 # przepuszczenie przez kanał BSC
-output_hamming = bsc(hamming_encoded, error_probability)
-# print(f"Ciag po przejsciu przez kanał BSC: {output_hamming}")
-hamming_decoded = hamming.decode(output_hamming)
-# print(f"Odkodowany ciąg po przejściu przez kanał BSC: {hamming_decoded}")
-print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, hamming_decoded)}\n")
-
-# przepuszczenie przez kanał Gilberta
-output_hamming2 = gilbert(hamming_encoded, p_of_error_when_good, p_of_good_to_bad, p_of_error_when_bad,
-                          p_of_bad_to_good)
-# print(f"Ciag po przejsciu przez kanał Gilberta: {output_hamming2}")
-hamming_decoded2 = hamming.decode(output_hamming2)
-# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {hamming_decoded2}")
-print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, hamming_decoded2)}\n")
-
-# testy list
-
-print('\n===========================================================================')
-
-print('\nKodowanie BCH\n')
-
-bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
-
-bch_encoded = bch_obj.encode(lst)
-
-print(f"Przykładowy ciąg:{lst}")
-print(f"Zakodowany ciąg: {bch_encoded}\n")
-
-# przepuszczenie przez kanał BSC
-output_bch = bsc_lists(bch_encoded, 0.2)
-print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
-bch_decoded = bch_obj.decode(output_bch)
-print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
-print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
-
-# przepuszczenie przez kanał Gilberta
-output_bch2 = gilbert_lists(bch_encoded, 0.22, 0.02, 0.65, 0.55)
-print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
-bch_decoded2 = bch_obj.decode(output_bch2)
-print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
-print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
+# output_bch = bsc_lists(bch_encoded, 0.2)
+# print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
+# bch_decoded = bch_obj.decode(output_bch)
+# print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
+# print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
+#
+# # przepuszczenie przez kanał Gilberta
+# output_bch2 = gilbert_lists(bch_encoded, 0.22, 0.02, 0.65, 0.55)
+# print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
+# bch_decoded2 = bch_obj.decode(output_bch2)
+# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
+# print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
 
 #
 # print('\n===========================================================================')

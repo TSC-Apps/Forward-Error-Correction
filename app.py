@@ -6,31 +6,40 @@ import hamming
 import matplotlib.pyplot as plt
 import unireedsolomon
 
-quantity_parameters = [200000, 400000, 600000, 800000, 1000000]
+quantity_parameters = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
 
-bsc_parameters = [0.000096854, 0.00096854, 0.0096854, 0.096854, 0.96854]
+bsc_parameters = [0.000016854, 0.00016854, 0.0016854, 0.016854, 0.16854]
 gilbert_parameters = [(0.000001, 0.000101648, 0.31, 0.914789), (0.000053513, 0.000196854, 0.65, 0.509547),
-                      (0.0003631513, 0.000396854, 0.9, 0.2768), (0.0003631513, 0.00496854, 0.99999, 0.04)]
+                      (0.0003631513, 0.000396854, 0.9, 0.2768), (0.0003631513, 0.00496854, 0.99999, 0.04),
+                      (0.0003631513, 0.00496854, 0.99999, 0.004)]
 
 for error_probability in bsc_parameters:
     ber_list = []
     for quantity in quantity_parameters:
-        lst = generate_bits(quantity)
-        coded_lst = code_triple(lst)
-        output = bsc(coded_lst, error_probability)
-        decoded_lst = decode_triple(output)
-        ber_list.append(ber_triple(lst, decoded_lst))
+        ber_test = []
+        for i in range(10):
+            lst = generate_bits(quantity)
+            coded_lst = code_triple(lst)
+            output = bsc(coded_lst, error_probability)
+            decoded_lst = decode_triple(output)
+            ber_test.append(ber_triple(lst, decoded_lst))
+
+        ber_list.append(sum(ber_test)/len(ber_test))
 
     plt.clf()
     plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
 
     ber_list_2 = []
     for quantity in quantity_parameters:
-        lst = generate_bits(quantity)
-        hamming_encoded = hamming.encode(lst)
-        output_hamming = bsc(hamming_encoded, error_probability)
-        hamming_decoded = hamming.decode(output_hamming)
-        ber_list_2.append(ber_triple(lst, hamming_decoded))
+        ber_test = []
+        for i in range(10):
+            lst = generate_bits(quantity)
+            hamming_encoded = hamming.encode(lst)
+            output_hamming = bsc(hamming_encoded, error_probability)
+            hamming_decoded = hamming.decode(output_hamming)
+            ber_test.append(ber_triple(lst, hamming_decoded))
+
+        ber_list_2.append(sum(ber_test)/len(ber_test))
 
     plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
     plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale BSC')
@@ -42,22 +51,30 @@ for error_probability in bsc_parameters:
 for parameter_list in gilbert_parameters:
     ber_list = []
     for quantity in quantity_parameters:
-        lst = generate_bits(quantity)
-        coded_lst = code_triple(lst)
-        output2 = gilbert(coded_lst, *parameter_list)
-        decoded_lst2 = decode_triple(output2)
-        ber_list.append(ber_triple(lst, decoded_lst2))
+        ber_test = []
+        for i in range(10):
+            lst = generate_bits(quantity)
+            coded_lst = code_triple(lst)
+            output2 = gilbert(coded_lst, *parameter_list)
+            decoded_lst2 = decode_triple(output2)
+            ber_test.append(ber_triple(lst, decoded_lst2))
+
+        ber_list.append(sum(ber_test)/len(ber_test))
 
     plt.clf()
     plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
 
     ber_list_2 = []
     for quantity in quantity_parameters:
-        lst = generate_bits(quantity)
-        hamming_encoded = hamming.encode(lst)
-        output_hamming2 = gilbert(hamming_encoded, *parameter_list)
-        hamming_decoded2 = hamming.decode(output_hamming2)
-        ber_list_2.append(ber_triple(lst, hamming_decoded2))
+        ber_test = []
+        for i in range(10):
+            lst = generate_bits(quantity)
+            hamming_encoded = hamming.encode(lst)
+            output_hamming2 = gilbert(hamming_encoded, *parameter_list)
+            hamming_decoded2 = hamming.decode(output_hamming2)
+            ber_test.append(ber_triple(lst, hamming_decoded2))
+
+        ber_list_2.append(sum(ber_test)/len(ber_test))
 
     plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
     plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale Gilberta')

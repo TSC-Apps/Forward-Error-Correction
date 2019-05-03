@@ -22,11 +22,22 @@ for error_probability in bsc_parameters:
         ber_list.append(ber_triple(lst, decoded_lst))
 
     plt.clf()
-    plt.plot(quantity_parameters, ber_list)
-    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
+
+    ber_list_2 = []
+    for quantity in quantity_parameters:
+        lst = generate_bits(quantity)
+        hamming_encoded = hamming.encode(lst)
+        output_hamming = bsc(hamming_encoded, error_probability)
+        hamming_decoded = hamming.decode(output_hamming)
+        ber_list_2.append(ber_triple(lst, hamming_decoded))
+
+    plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
+    plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale BSC')
     plt.xlabel('Dlugosc wiadomosci')
     plt.ylabel('BER')
-    plt.savefig('tripling_code_bsc_ber_err_prob=' + str(error_probability) + '.png')
+    plt.legend()
+    plt.savefig('bsc_ber_err_prob=' + str(error_probability) + '.png')
 
 for parameter_list in gilbert_parameters:
     ber_list = []
@@ -38,44 +49,22 @@ for parameter_list in gilbert_parameters:
         ber_list.append(ber_triple(lst, decoded_lst2))
 
     plt.clf()
-    plt.plot(quantity_parameters, ber_list)
-    plt.title('Zaleznosc BER od dlugosci wiadomosci')
-    plt.xlabel('Dlugosc wiadomosci')
-    plt.ylabel('BER')
-    plt.savefig('tripling_code_gilbert_ber_err_prob=' + str(parameter_list) + '.png')
+    plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
 
-# Kodowanie Hamminga\
-for error_probability in bsc_parameters:
-    ber_list = []
-    for quantity in quantity_parameters:
-        lst = generate_bits(quantity)
-        hamming_encoded = hamming.encode(lst)
-        output_hamming = bsc(hamming_encoded, error_probability)
-        hamming_decoded = hamming.decode(output_hamming)
-        ber_list.append(ber_triple(lst, hamming_decoded))
-
-    plt.clf()
-    plt.plot(quantity_parameters, ber_list)
-    plt.title('Zaleznosc BER od dlugosci wiadomosci')
-    plt.xlabel('Dlugosc wiadomosci')
-    plt.ylabel('BER')
-    plt.savefig('hamming_bsc_ber_err_prob=' + str(error_probability) + '.png')
-
-for parameter_list in gilbert_parameters:
-    ber_list = []
+    ber_list_2 = []
     for quantity in quantity_parameters:
         lst = generate_bits(quantity)
         hamming_encoded = hamming.encode(lst)
         output_hamming2 = gilbert(hamming_encoded, *parameter_list)
         hamming_decoded2 = hamming.decode(output_hamming2)
-        ber_list.append(ber_triple(lst, hamming_decoded2))
+        ber_list_2.append(ber_triple(lst, hamming_decoded2))
 
-    plt.clf()
-    plt.plot(quantity_parameters, ber_list)
-    plt.title('Zaleznosc BER od dlugosci wiadomosci')
+    plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
+    plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale Gilberta')
     plt.xlabel('Dlugosc wiadomosci')
     plt.ylabel('BER')
-    plt.savefig('hamming_gilbert_ber_err_prob=' + str(parameter_list) + '.png')
+    plt.legend()
+    plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
 
 # print('\nKodowanie BCH\n')
 #

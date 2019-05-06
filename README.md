@@ -83,8 +83,6 @@ Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
 Elementowa stopa błędów, wskaźnik określający prawdopodobieństwo wystąpienia zafałszowania bitu informacji w czasie transmisji danych. Z matematycznego punktu widzenia jest to stosunek liczby bitów odebranych błędnie do całkowitej liczby przesłanych bitów. W dzisiejszych systemach BER jest zależny od szybkości transmisji i od rezerwy mocy sygnału. Dobre jakościowo połączenie charakteryzuje się BER poniżej 10<sup>-10</sup>. W typowych kanałach zawiera się w przedziale <10<sup>-2</sup>, 10<sup>-5</sup>>. Dla transmisji danych wymagane jest BER ~ (10<sup>-6</sup>, 10<sup>-9</sup>).
 
-Mamy przeprowadzić badania dla BER kanału 10<sup>-3</sup> oraz 10<sup>-8</sup>. (???)
-
 
 
 #### Kod z powtórzeniem

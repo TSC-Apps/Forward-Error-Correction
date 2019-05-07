@@ -96,7 +96,7 @@ for parameter_list in gilbert_parameters:
 
         ber_list_3.append(sum(ber_test) / len(ber_test))
 
-    plt.plot(quantity_parameters, ber_list_3, label='Kodowanie BSC')
+    plt.plot(quantity_parameters, ber_list_3, label='Kodowanie BCH')
 
     ber_list_2 = []
     for quantity in quantity_parameters:

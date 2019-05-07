@@ -177,10 +177,10 @@ Ten model pozwala dość dobrze symulować błędy grupowe.
 
 Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez kanał ciągi kodowane kodem potrojeniowym, Hamminga oraz BCH. Zmienialiśmy cztery różne parametry kanału:
 
-* 1-k - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie dobrym,
-* p - prawdopodobieństwo przejścia ze stanu dobrego do złego,
-* 1-h - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, 
-* r - prawdopodobieństwo przejścia ze stanu złego do dobrego.
+* *1-k* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie dobrym,
+* *p* - prawdopodobieństwo przejścia ze stanu dobrego do złego,
+* *1-h* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, 
+* *r* - prawdopodobieństwo przejścia ze stanu złego do dobrego.
 
 Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 

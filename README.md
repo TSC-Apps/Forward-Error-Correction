@@ -71,7 +71,7 @@ Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrze
 
 #### Model
 
-![](F:\Dev\Git\Forward-Error-Correction\model.png)
+![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/model.png>)
 
 Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
@@ -149,25 +149,52 @@ Wykorzystana biblioteka:
 > <https://pypi.org/project/libhamming/>
 
 
+### Modele kanałów
+
+W projekcie zaimplementowaliśmy dwa modele kanałów, za pośrecnictwem których
+przesyłany jest ciąg bitów powstały w wyniku zakodowania wiadomości. Podczas transmisji 
+na sygnał wpływają zakłócenia, co prowadzi do tego, że niektóre bity mogą 
+zostać błędnie odebrane po transmisji, a co za tym idzie, wiadomość zostanie
+niepoprawnie zdekodowana. Dobierając eksperymentalnie właściwe
+dla danego modelu prawdopodobieństwa przekłamań, zasymulowaliśmy kanały
+różnej jakości i sprawdziliśmy, w jakim stopniu uszkadzają one sygnał.
+
+##### Binary Symmetric Channel (BSC) 
+W tym kanale podejmujemy decyzję, czy dany bit zostanie przekłamany, czy nie,
+na podstawie prostego losowania z rozkładu jedostajnego na przedziale [0,1]
+z zadanym progowym prawdopodobieństwem błędu *p*, które dzieli przedział na dwie części.
+Jeśli wylosowana liczba znajdzie się poniżej progu, bit zostanie przekłamany,
+jeśli powyżej - przesłany poprawnie.
+
+##### Model Gilberta-Elliotta
+Bardziej złożoną symulacją jest model GIlberta-Elliotta. Jest oparty o łańcuch
+Markowa z dowma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo
+błędu jest mniejsze i wynosi *1-k*, w złym stanie jest większe i wynosi *1-h* (*k* i *h* to odpowiednie 
+prawdopodobieństwa poprawnej transmisji bitu), w danym stanie
+decyzja o błędzie jest podejmowana jak w *BSC*. Poza tym ustalamy prawdopodobieństwo 
+przejścia ze stanu dobrego do złego (*p*) i ze stanu złego do dobrego (*r*). 
+Ten model pozwala dość dobrze symulować błędy grupowe.
+
+ ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/gilbert.png>)
 
 ## Wyniki badań
 
 Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez kanał ciągi kodowane kodem potrojeniowym, Hamminga oraz BCH. Zmienialiśmy cztery różne parametry kanału:
 
-* A - prawdopodobieństwo wystąpienia błędu jeśli kanał znajduje się w stanie dobrym,
-* B - prawdopodobieństwo przejścia ze stanu dobrego do złego,
-* C - prawdopodobieństwo wystąpienia błędu jeśli kanał znajduje się w stanie złym, 
-* D - prawdopodobieństwo przejścia ze stanu złego do dobrego.
+* 1-k - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie dobrym,
+* p - prawdopodobieństwo przejścia ze stanu dobrego do złego,
+* 1-h - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, 
+* r - prawdopodobieństwo przejścia ze stanu złego do dobrego.
 
 Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
-1. prawie idealny: `A = 0.000001`,  `B = 0.000101648`,  `C = 0.31`, `D = 0.914789`
+1. prawie idealny: `1-k = 0.000001`,  `p = 0.000101648`,  `1-h = 0.31`, `r = 0.914789`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(1e-06%2C%200.000101648%2C%200.31%2C%200.914789).png>)
 
    
 
-2. dobry: `A = 0.000053513`, `B = 0.000196854`, `C =0.65`, `D = 0.509547`
+2. dobry: `1-k = 0.000053513`, `p = 0.000196854`, `1-h =0.65`, `r = 0.509547`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.000196854%2C%200.65%2C%200.509547).png>)
 
@@ -205,7 +232,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    
 
-3. niezły: `A = 0.0003631513`, `B = 0.000396854`, `C = 0.9`, `D = 0.2768`
+3. niezły: `1-k = 0.0003631513`, `p = 0.000396854`, `1-h = 0.9`, `r = 0.2768`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.000396854%2C%200.9%2C%200.2768).png>)
 
@@ -243,7 +270,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    
 
-4. średni: `A = 0.000053513`,  `B = 0.00496854`, `C = 0.9`, `D = 0.2768`
+4. średni: `1-k = 0.000053513`,  `p = 0.00496854`, `1-h = 0.9`, `r = 0.2768`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.00496854%2C%200.9%2C%200.2768).png>)
 
@@ -281,7 +308,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    
 
-5. zły: `A = 0.0003631513`, `B = 0.00496854`, `C = 0.99999`, `D = 0.04`
+5. zły: `1-k = 0.0003631513`, `p = 0.00496854`, `1-h = 0.99999`, `r = 0.04`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.04).png>)
 
@@ -319,7 +346,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    
 
-6. fatalny: `A = 0.0003631513`, `B = 0.00496854`, `C = 0.99999`, `D = 0.004`
+6. fatalny: `1-k = 0.0003631513`, `p = 0.00496854`, `1-h = 0.99999`, `r = 0.004`
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png>)
 
@@ -327,6 +354,15 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 
 
-W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy tym lepszy), pozioma natomiast długość wiadomości - ilość bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** kodowanie BCH zachowuje wynik, potrojeniowe staje się dużo gorsze, jednak nadal dwukrotnie lepsze od Hamminga. W **kanale niezłym** oraz **średnim** BER kodowania potrojeniowego coraz bardziej zbliża się do współczynnika błędu kodu Hamminga, przy czym próbka zakodowana kanałem BCH stale jest bezbłędnie odkodowywana. Dopiero w **kanale złym** kodowanie potrojeniowe i Hamminga dają podobne rezultaty, a w kodowaniu BCH pojawia się BER, nieznacznie mniejszy od konkurencyjnych kanałów. W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH nadal ma nad nimi przewagę.
+W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy, tym lepszy), pozioma natomiast oznacza długość wiadomości - 
+liczbę bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, 
+które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** 
+kodowanie BCH zachowuje wynik, potrojeniowe staje się dużo gorsze, jednak nadal dwukrotnie lepsze od Hamminga. 
+W **kanale niezłym** oraz **średnim** BER kodowania potrojeniowego coraz bardziej zbliża się do współczynnika błędu kodu Hamminga, 
+przy czym próbka zakodowana kanałem BCH stale jest bezbłędnie odkodowywana. Dopiero w **kanale złym** kodowanie potrojeniowe 
+i Hamminga dają podobne rezultaty, a w kodowaniu BCH pojawia się BER nieznacznie mniejszy od konkurencyjnych kanałów. 
+W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH nadal ma nad nimi przewagę.
 
-Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga. 
+Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. 
+Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. 
+Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga. 

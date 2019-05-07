@@ -39,6 +39,8 @@ Służą do zabezpieczenia danych przed błędami transmisji poprzez dołączeni
 
 
 
+
+
 W skład kodów nadmiarowych wchodzą:
 
 * **kody blokowe** - informacje podzielone są na bloki k-elementowe. Do każdego z nich dołączana jest sekwencja kontrolna,
@@ -53,15 +55,11 @@ W skład kodów nadmiarowych wchodzą:
 
 Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrzenia danego ciągu w nadmiarową informację, którą uzyskuje się poprzez użycie kodów korekcyjnych.
 
-
-
 ###### Wady FEC:
 
 - skomplikowane i czasochłonne metody korekcji błędów,
 - brak gwarancji skorygowania wszystkich błędów,
 - przy dużej liczbie błędów dekoder zamiast ją zmniejszać może spowodować jej powiększenie.
-
-
 
 ###### Zalety FEC:
 
@@ -73,7 +71,7 @@ Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrze
 
 #### Model
 
-![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/model.png>)
+![](F:\Dev\Git\Forward-Error-Correction\model.png)
 
 Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
@@ -83,8 +81,11 @@ Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
 Elementowa stopa błędów, wskaźnik określający prawdopodobieństwo wystąpienia zafałszowania bitu informacji w czasie transmisji danych. Z matematycznego punktu widzenia jest to stosunek liczby bitów odebranych błędnie do całkowitej liczby przesłanych bitów. W dzisiejszych systemach BER jest zależny od szybkości transmisji i od rezerwy mocy sygnału. Dobre jakościowo połączenie charakteryzuje się BER poniżej 10<sup>-10</sup>. W typowych kanałach zawiera się w przedziale <10<sup>-2</sup>, 10<sup>-5</sup>>. Dla transmisji danych wymagane jest BER ~ (10<sup>-6</sup>, 10<sup>-9</sup>).
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 #### Kod z powtórzeniem
 
 Jeden z najprostszych kodów korekcyjnych polegający na powtórzeniu danego bitu kilkukrotnie. Elementowa stopa błędu jest relatywnie niska, nie jest to niezawodna metoda, jednak sporo zyskuje dzięki swojej łatwości implementacji. 
@@ -127,11 +128,15 @@ t - zdolność korekcji błędów.
 
 
 
-Biblioteki:
+Wykorzystana biblioteka:
 
-> <https://github.com/jkrauze/bch>
->
 > <https://github.com/jkent/python-bchlib>
+
+
+
+
+
+
 
 
 
@@ -139,69 +144,189 @@ Biblioteki:
 
 Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2 - 1, 2, 4, 8, 16...
 
-
-
-Biblioteka:
+Wykorzystana biblioteka:
 
 > <https://pypi.org/project/libhamming/>
 
 
 
-**TODO** zapoznać się z:
+## Wyniki badań
 
-<https://www.geeksforgeeks.org/computer-network-hamming-code/>
+Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez kanał ciągi kodowane kodem potrojeniowym, Hamminga oraz BCH. Zmienialiśmy cztery różne parametry kanału:
 
-<https://www.youtube.com/watch?v=373FUw-2U2k>
+* A - prawdopodobieństwo wystąpienia błędu jeśli kanał znajduje się w stanie dobrym,
+* B - prawdopodobieństwo przejścia ze stanu dobrego do złego,
+* C - prawdopodobieństwo wystąpienia błędu jeśli kanał znajduje się w stanie złym, 
+* D - prawdopodobieństwo przejścia ze stanu złego do dobrego.
+
+Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
+
+1. prawie idealny: `A = 0.000001`,  `B = 0.000101648`,  `C = 0.31`, `D = 0.914789`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(1e-06%2C%200.000101648%2C%200.31%2C%200.914789).png>)
+
+   
+
+2. dobry: `A = 0.000053513`, `B = 0.000196854`, `C =0.65`, `D = 0.509547`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.000196854%2C%200.65%2C%200.509547).png>)
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+3. niezły: `A = 0.0003631513`, `B = 0.000396854`, `C = 0.9`, `D = 0.2768`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.000396854%2C%200.9%2C%200.2768).png>)
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+4. średni: `A = 0.000053513`,  `B = 0.00496854`, `C = 0.9`, `D = 0.2768`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.00496854%2C%200.9%2C%200.2768).png>)
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+5. zły: `A = 0.0003631513`, `B = 0.00496854`, `C = 0.99999`, `D = 0.04`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.04).png>)
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+6. fatalny: `A = 0.0003631513`, `B = 0.00496854`, `C = 0.99999`, `D = 0.004`
+
+   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png>)
 
 
 
-#### Kod Reed-Solomona
-
-Biblioteki:
-
-> <https://pypi.org/project/reedsolo/>>
->
-> <https://pypi.org/project/unireedsolomon/>
->
-> <https://github.com/vivint/infectious>
 
 
+W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy tym lepszy), pozioma natomiast długość wiadomości - ilość bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** kodowanie BCH zachowuje wynik, potrojeniowe staje się dużo gorsze, jednak nadal dwukrotnie lepsze od Hamminga. W **kanale niezłym** oraz **średnim** BER kodowania potrojeniowego coraz bardziej zbliża się do współczynnika błędu kodu Hamminga, przy czym próbka zakodowana kanałem BCH stale jest bezbłędnie odkodowywana. Dopiero w **kanale złym** kodowanie potrojeniowe i Hamminga dają podobne rezultaty, a w kodowaniu BCH pojawia się BER, nieznacznie mniejszy od konkurencyjnych kanałów. W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH nadal ma nad nimi przewagę.
 
-**TODO** zapoznać się z:
-
-> <https://www.academia.edu/31243287/Reed_Solomon_Encoding_Simplified_Explanation_for_Programmers>
-
-
-
-
-
-Ogólne biblioteki do sprawdzenia: 
-
-<https://pypi.org/project/zfec/>
-
-
-
-
-## Notatki
-#### 13 Marzec 2019
-
-> - BCH - <https://github.com/jkrauze/bch> 
-> - Reed-Solomon - <https://pypi.org/project/reedsolo/>
->   - biblioteki, kilka przykładów kodów nadmiarowych encode, decode
-> - badania - eksperyment numeryczny zbudowanie modelu
-> - potrajanie bitów - intuicyjny sposób - różne sposoby nadmiarowości
-> - kanał - uszkadza bity, np. model Gilberta, model…
->   różne parametry kanału - mniej lub bardziej zaszumiony
->   kody są projektowane pod różne kanały
->   kanały różnią się parametrami - prawdopodobieństwem błędu oraz typem błędu
-> - BER kanału: 10-3, 10-8 - stopień zaszumienia
-> - wyjście: obserwowana jakość transmisji oraz obniżona prędkość transmisji, zyskujemy jedno, tracimy drugie
->
-> 
->
-> ##### Na kolejne zajęcia:
->
-> - model - w sprawozdaniu
-> - biblioteki kodowe - różne rodziny kodów, kodery i dekodery, różne nadmiarowości
-> - próbki kodu
-
+Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga. 

@@ -5,6 +5,7 @@ from channels import bsc, gilbert, bsc_lists, gilbert_lists
 import hamming
 import matplotlib.pyplot as plt
 import unireedsolomon
+import bch
 
 quantity_parameters = [100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000]
 
@@ -12,6 +13,13 @@ bsc_parameters = [0.000016854, 0.00016854, 0.0016854, 0.016854, 0.16854]
 gilbert_parameters = [(0.000001, 0.000101648, 0.31, 0.914789), (0.000053513, 0.000196854, 0.65, 0.509547),
                       (0.0003631513, 0.000396854, 0.9, 0.2768), (0.000053513, 0.00496854, 0.9, 0.2768),
                       (0.0003631513, 0.00496854, 0.99999, 0.04), (0.0003631513, 0.00496854, 0.99999, 0.004)]
+
+bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
+
+
+# ======================================================================================================================================================
+# BSC
+# ======================================================================================================================================================
 
 # for error_probability in bsc_parameters:
 #     ber_list = []
@@ -47,7 +55,12 @@ gilbert_parameters = [(0.000001, 0.000101648, 0.31, 0.914789), (0.000053513, 0.0
 #     plt.ylabel('BER')
 #     plt.legend()
 #     plt.savefig('bsc_ber_err_prob=' + str(error_probability) + '.png')
-#
+
+
+# ======================================================================================================================================================
+# Gilbert
+# ======================================================================================================================================================
+
 for parameter_list in gilbert_parameters:
     ber_list = []
     for quantity in quantity_parameters:
@@ -76,6 +89,25 @@ for parameter_list in gilbert_parameters:
 
         ber_list_2.append(sum(ber_test)/len(ber_test))
 
+    ber_list_3 = []
+    for quantity in quantity_parameters:
+        ber_test = []
+        for i in range(10):
+            lst = generate_bits(quantity)
+            chunks = [lst[x:x + 700] for x in range(0, len(lst), 700)]
+            bch_decoded_all2 = []
+            for each in chunks:
+                bch_encoded2 = bch_obj.encode(each)
+                bch_output2 = gilbert_lists(bch_encoded2, *parameter_list)
+                bch_decoded2 = bch_obj.decode(bch_output2)
+                bch_decoded_all2.append(bch_decoded2)
+            bch_decoded_all_united2 = []
+            for each in bch_decoded_all2:
+                bch_decoded_all_united2 += each
+            ber_test.append(ber_triple(lst, bch_decoded_all_united2))
+
+        ber_list_3.append(sum(ber_test)/len(ber_test))
+
     plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
     plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale Gilberta')
     plt.xlabel('Dlugosc wiadomosci')
@@ -83,28 +115,9 @@ for parameter_list in gilbert_parameters:
     plt.legend()
     plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
 
-# print('\nKodowanie BCH\n')
-#
-# bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
-#
-# bch_encoded = bch_obj.encode(lst)
-#
-# print(f"Przykładowy ciąg:{lst}")
-# print(f"Zakodowany ciąg: {bch_encoded}\n")
-
-# przepuszczenie przez kanał BSC
-# output_bch = bsc_lists(bch_encoded, 0.2)
-# print(f"Ciag po przejsciu przez kanał BSC: {output_bch}")
-# bch_decoded = bch_obj.decode(output_bch)
-# print(f"Odkodowany ciąg po przejściu przez kanał BSC: {bch_decoded}")
-# print(f"BER po przejściu przez kanał BSC: {ber_triple(lst, bch_decoded)}\n")
-#
-# # przepuszczenie przez kanał Gilberta
-# output_bch2 = gilbert_lists(bch_encoded, 0.22, 0.02, 0.65, 0.55)
-# print(f"Ciag po przejsciu przez kanał Gilberta: {output_bch2}")
-# bch_decoded2 = bch_obj.decode(output_bch2)
-# print(f"Odkodowany ciąg po przejściu przez kanał Gilberta: {bch_decoded2}")
-# print(f"BER po przejściu przez kanał Gilberta: {ber_triple(lst, bch_decoded2)}\n")
+# ======================================================================================================================================================
+# Reed-Solomon
+# ======================================================================================================================================================
 
 # #
 # print('\n===========================================================================')

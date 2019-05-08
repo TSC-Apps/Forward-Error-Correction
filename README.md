@@ -59,7 +59,7 @@ Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrze
 
 - skomplikowane i czasochłonne metody korekcji błędów,
 - brak gwarancji skorygowania wszystkich błędów,
-- przy dużej liczbie błędów dekoder zamiast ją zmniejszać może spowodować jej powiększenie.
+- przy dużej liczbie błędów dekoder zamiast ją zmniejszać, może spowodować jej powiększenie.
 
 ###### Zalety FEC:
 
@@ -361,4 +361,22 @@ W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH n
 
 Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. 
 Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. 
-Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga. 
+Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego 
+przy kodowaniu potrojeniowym czy też Hamminga.
+
+## Notatki z 8 maja
+
+- 12.06. - przedstawienie projektu
+#### Kolejny etap 
+
+- zestawiamy koszt uzyskania danej nadmiarowości z jej skutecznością i wizualizujemy,
+- testy dla ustalonej długości wiadomości na osi *x*, tniemy obecne wykresy pionowo,
+- paramtery charakteryzujące - BER na osi *x*, nadmiarowość *α* na osi *y*, gdzie
+*α = (n-k)/n*, k to długość oryginalnej wiadomości, n - zakodowanej wiadomości, 
+n-k - nadmiarowość lub (?) przesyłamy *m* bitów wiadomości i *αm* wpuszczamy do kanału, 
+- ustawienia kodera i dekodera wpływają na jakość transmisji,
+- badamy rodzinę kodów BCH lub Hamminga, manipulując w ustawieniach kodera wartościami *k* i *n*,
+dobieramy najlepsze parametry, czy da się przywrócić/ulepszyć BCH,
+- na wykresie zależności BER (oś *x*) i *α* (oś *y*) wprowadzamy jakieś kryterium wyboru najlepszego z otrzymanych punktów,
+pionowa granica będzie oznaczać maksymalną stopę błędów, pozioma granica zadaje minimalną prędkość transmisji,
+chcemy minimalizować stopę błędów, jednocześnie maksymalizując prędkość transmisji.  

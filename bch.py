@@ -58,14 +58,14 @@ class BCH:
 
 BCH_POLYNOMIAL = 8219
 
-BCH_BITS = 10
-data = generator.generate_bits(1007)
+# BCH_BITS = 10
+# data = generator.generate_bits(1007)
 
 # BCH_BITS = 50
 # data = generator.generate_bits(942)
 
-# BCH_BITS = 100
-# data = generator.generate_bits(864)
+BCH_BITS = 100
+data = generator.generate_bits(864)
 
 # BCH_BITS = 200
 # data = generator.generate_bits(718)
@@ -76,28 +76,28 @@ data = generator.generate_bits(1007)
 # BCH_BITS = 630
 # data = generator.generate_bits(297)
 
-bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
-
-print(f'\n{len(data)} Data:                      {data}')
-
-encoded = bch.encode(data)
-print(f'{len(encoded)} Encoded (before channel):  {encoded}')
-
-decoded = bch.decode(encoded)
-print(f'{len(decoded)} Decoded:                   {decoded}')
-
-
-lenSum = 0
-
-for each in encoded:
-    lenSum += len(each)
-
-print(f'SUM length (enc): {lenSum}')
+    # bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
+    #
+    # print(f'\n{len(data)} Data:                      {data}')
+    #
+    # encoded = bch.encode(data)
+    # print(f'{len(encoded)} Encoded (before channel):  {encoded}')
+    #
+    # decoded = bch.decode(encoded)
+    # print(f'{len(decoded)} Decoded:                   {decoded}')
+    #
+    #
+    # lenSum = 0
+    #
+    # for each in encoded:
+    #     lenSum += len(each)
+    #
+    # print(f'SUM length (enc): {lenSum}')
 
 # BCH_POLYNOMIAL = 8219
 # ------+--------------+-----------------+-----------------+-------------------------------------------+------------------------------------------
-# case  | BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_LENGTH  | ENCODED_BITS                              | k
-#       |              | (in packets)    | (ilosc podlist) | (srednio, im dalej tym wariancja wieksza) | (dlugosc ciagu informacyjnego)
+# case  | BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_LENGTH  | ENCODED_BITS                              | n - k
+#       |              | (in packets)    | (ilosc podlist) | (srednio, im dalej tym wariancja wieksza) | (liczba pozycji kontrolnych)
 # ------+--------------+-----------------+-----------------+-------------------------------------------+-------------------------------------------
 # a)    | 10           | 1007            | 1024            | 1120                                      | 113
 # b)    | 50           | 942             | 1024            | 1510                                      | 568
@@ -111,11 +111,7 @@ print(f'SUM length (enc): {lenSum}')
 # MAX_DATA_LENGTH - wiadomosc dzielimy na pakiety o maksymalnie tej dlugosci
 # ENCODED_LENGTH - ilosc podlist zakodowanego ciagu (useless)
 # ENCODED_BITS - ilosc bitow w zakodowanym ciagu wraz z ciagiem oryginalnym
-# k - dlugosc ciagu informacyjnego
-# k = ENCODED_BITS - MAX_DATA_LENGTH
-
-#
-
+# n - k = ENCODED_BITS - MAX_DATA_LENGTH
 
 # wnioski
 #   - wzrost zdolnosci korekcyjnej (BCH_BITS, t) sprawia, ze mozemy operowac na coraz mniejszych pakietach, natomiast dlugosc zakodowanej informacji sie zwieksza.

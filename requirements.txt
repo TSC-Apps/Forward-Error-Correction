@@ -1,3 +1,4 @@
+bchlib==0.7
 cycler==0.10.0
 docopt==0.6.2
 kiwisolver==1.1.0
@@ -9,4 +10,3 @@ python-dateutil==2.8.0
 reedsolo==0.3
 six==1.12.0
 sympy==1.4
-unireedsolomon==1.0

@@ -16,6 +16,52 @@ gilbert_parameters = [(0.000001, 0.000101648, 0.31, 0.914789), (0.000053513, 0.0
 
 bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
 
+for parameter_list in gilbert_parameters:
+    plt.clf()
+    ber_list = []
+    # for i in range(10):
+    lst = generate_bits(1000000)
+    coded_lst = code_triple(lst)
+    output = gilbert(coded_lst, *parameter_list)
+    decoded_lst = decode_triple(output)
+    # ber_test.append(ber_triple(lst, decoded_lst2))
+    ber_list.append(ber_triple(lst, decoded_lst))
+
+    plt.plot(ber_list, [3], label='Kodowanie potrojeniowe')
+
+    ber_list = []
+    lst = generate_bits(1000000)
+    hamming_encoded = hamming.encode(lst)
+    output_hamming = gilbert(hamming_encoded, *parameter_list)
+    hamming_decoded = hamming.decode(output_hamming)
+    ber_list.append(ber_triple(lst, hamming_decoded))
+    plt.plot(ber_list, [2], label='Kodowanie Hamminga')
+
+    ber_list = []
+    lst = generate_bits(1000000)
+    chunks = [lst[x:x + 700] for x in range(0, len(lst), 700)]
+    bch_decoded_all2 = []
+    for each in chunks:
+        bch_encoded2 = bch_obj.encode(each)
+        bch_output2 = gilbert_lists(bch_encoded2, *parameter_list)
+        bch_decoded2 = bch_obj.decode(bch_output2)
+        bch_decoded_all2.append(bch_decoded2)
+    bch_decoded_all_united2 = []
+    for each in bch_decoded_all2:
+        bch_decoded_all_united2 += each
+    ber_list.append(ber_triple(lst, bch_decoded_all_united2))
+
+    plt.plot(ber_list, [2], label='Kodowanie BCH')
+
+    plt.title('Zestawienie nadmiarowości z BER różnych kodowań')
+    plt.xlabel('BER')
+    plt.ylabel('Nadmiarowość')
+    plt.legend()
+    plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
+
+
+
+
 
 # ======================================================================================================================================================
 # BSC
@@ -61,61 +107,61 @@ bch_obj = bch.BCH(8219, 160)  # bch_polynomial, bch_bits
 # Gilbert
 # ======================================================================================================================================================
 
-for parameter_list in gilbert_parameters:
-    ber_list = []
-    for quantity in quantity_parameters:
-        ber_test = []
-        for i in range(10):
-            lst = generate_bits(quantity)
-            coded_lst = code_triple(lst)
-            output2 = gilbert(coded_lst, *parameter_list)
-            decoded_lst2 = decode_triple(output2)
-            ber_test.append(ber_triple(lst, decoded_lst2))
-
-        ber_list.append(sum(ber_test)/len(ber_test))
-
-    plt.clf()
-    plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
-
-    ber_list_3 = []
-    for quantity in quantity_parameters:
-        ber_test = []
-        for i in range(10):
-            lst = generate_bits(quantity)
-            chunks = [lst[x:x + 700] for x in range(0, len(lst), 700)]
-            bch_decoded_all2 = []
-            for each in chunks:
-                bch_encoded2 = bch_obj.encode(each)
-                bch_output2 = gilbert_lists(bch_encoded2, *parameter_list)
-                bch_decoded2 = bch_obj.decode(bch_output2)
-                bch_decoded_all2.append(bch_decoded2)
-            bch_decoded_all_united2 = []
-            for each in bch_decoded_all2:
-                bch_decoded_all_united2 += each
-            ber_test.append(ber_triple(lst, bch_decoded_all_united2))
-
-        ber_list_3.append(sum(ber_test) / len(ber_test))
-
-    plt.plot(quantity_parameters, ber_list_3, label='Kodowanie BCH')
-
-    ber_list_2 = []
-    for quantity in quantity_parameters:
-        ber_test = []
-        for i in range(10):
-            lst = generate_bits(quantity)
-            hamming_encoded = hamming.encode(lst)
-            output_hamming2 = gilbert(hamming_encoded, *parameter_list)
-            hamming_decoded2 = hamming.decode(output_hamming2)
-            ber_test.append(ber_triple(lst, hamming_decoded2))
-
-        ber_list_2.append(sum(ber_test)/len(ber_test))
-
-    plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
-    plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale Gilberta')
-    plt.xlabel('Dlugosc wiadomosci')
-    plt.ylabel('BER')
-    plt.legend()
-    plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
+# for parameter_list in gilbert_parameters:
+#     ber_list = []
+#     for quantity in quantity_parameters:
+#         ber_test = []
+#         for i in range(10):
+#             lst = generate_bits(quantity)
+#             coded_lst = code_triple(lst)
+#             output2 = gilbert(coded_lst, *parameter_list)
+#             decoded_lst2 = decode_triple(output2)
+#             ber_test.append(ber_triple(lst, decoded_lst2))
+#
+#         ber_list.append(sum(ber_test)/len(ber_test))
+#
+#     plt.clf()
+#     plt.plot(quantity_parameters, ber_list, label='Kodowanie potrojeniowe')
+#
+#     ber_list_3 = []
+#     for quantity in quantity_parameters:
+#         ber_test = []
+#         for i in range(10):
+#             lst = generate_bits(quantity)
+#             chunks = [lst[x:x + 700] for x in range(0, len(lst), 700)]
+#             bch_decoded_all2 = []
+#             for each in chunks:
+#                 bch_encoded2 = bch_obj.encode(each)
+#                 bch_output2 = gilbert_lists(bch_encoded2, *parameter_list)
+#                 bch_decoded2 = bch_obj.decode(bch_output2)
+#                 bch_decoded_all2.append(bch_decoded2)
+#             bch_decoded_all_united2 = []
+#             for each in bch_decoded_all2:
+#                 bch_decoded_all_united2 += each
+#             ber_test.append(ber_triple(lst, bch_decoded_all_united2))
+#
+#         ber_list_3.append(sum(ber_test) / len(ber_test))
+#
+#     plt.plot(quantity_parameters, ber_list_3, label='Kodowanie BCH')
+#
+#     ber_list_2 = []
+#     for quantity in quantity_parameters:
+#         ber_test = []
+#         for i in range(10):
+#             lst = generate_bits(quantity)
+#             hamming_encoded = hamming.encode(lst)
+#             output_hamming2 = gilbert(hamming_encoded, *parameter_list)
+#             hamming_decoded2 = hamming.decode(output_hamming2)
+#             ber_test.append(ber_triple(lst, hamming_decoded2))
+#
+#         ber_list_2.append(sum(ber_test)/len(ber_test))
+#
+#     plt.plot(quantity_parameters, ber_list_2, label='Kodowanie Hamminga')
+#     plt.title('Zaleznosc BER od dlugosci wiadomosci w kanale Gilberta')
+#     plt.xlabel('Dlugosc wiadomosci')
+#     plt.ylabel('BER')
+#     plt.legend()
+#     plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
 
 # ======================================================================================================================================================
 # Reed-Solomon

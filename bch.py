@@ -7,13 +7,14 @@ import random
 import os
 
 class BCH:
-    def __init__(self, p=8219, b=16):
+    def __init__(self, p, t):
         self.bch_polynomial = p
-        self.bch_bits = b
+        self.bch_bits = t
         self.bitflips = 0
 
         # utworzenie obiektu klasy z biblioteki bchlib
         self.obj = bchlib.BCH(self.bch_polynomial, self.bch_bits)
+        # self.boj = bchlib.BCH.__init__()
 
     def encode(self, data):
         # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
@@ -52,17 +53,74 @@ class BCH:
             print('Nie udalo sie odkodowac ciagu danych.')
 
 
+# BCH_BITS - t, zdolnosc korekcji bledow, liczba bitow, ktore maksymalnie mozna naprawic
+# BCH_POLYNOMIAL - wielomian. Na jego podstawie wyznaczane jest automatycznie m,
+
+BCH_POLYNOMIAL = 8219
+
+BCH_BITS = 10
+data = generator.generate_bits(1007)
+
+# BCH_BITS = 50
+# data = generator.generate_bits(942)
+
+# BCH_BITS = 100
+# data = generator.generate_bits(864)
+
+# BCH_BITS = 200
+# data = generator.generate_bits(718)
+
+# BCH_BITS = 500
+# data = generator.generate_bits(362)
+
+# BCH_BITS = 630
+# data = generator.generate_bits(297)
+
+bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
+
+print(f'\n{len(data)} Data:                      {data}')
+
+encoded = bch.encode(data)
+print(f'{len(encoded)} Encoded (before channel):  {encoded}')
+
+decoded = bch.decode(encoded)
+print(f'{len(decoded)} Decoded:                   {decoded}')
+
+
+lenSum = 0
+
+for each in encoded:
+    lenSum += len(each)
+
+print(f'SUM length (enc): {lenSum}')
+
 # BCH_POLYNOMIAL = 8219
-# BCH_BITS = 160
+# ------+--------------+-----------------+-----------------+-------------------------------------------+------------------------------------------
+# case  | BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_LENGTH  | ENCODED_BITS                              | k
+#       |              | (in packets)    | (ilosc podlist) | (srednio, im dalej tym wariancja wieksza) | (dlugosc ciagu informacyjnego)
+# ------+--------------+-----------------+-----------------+-------------------------------------------+-------------------------------------------
+# a)    | 10           | 1007            | 1024            | 1120                                      | 113
+# b)    | 50           | 942             | 1024            | 1510                                      | 568
+# c)    | 100          | 864             | 1027            | 1980                                      | 1116
+# d)    | 200          | 718             | 1043            | 2870                                      | 2006
+# e)    | 500          | 362             | 1175            | 5150                                      | 4788
+# f)    | 630          | 297             | 1321            | 5680                                      | 5383
+# ------+--------------+-----------------+-----------------+-------------------------------------------+------------------------------------------
+
+# BCH_BITS - t, zdolnosc korekcji bledow, liczba bitow, ktore maksymalnie mozna naprawic
+# MAX_DATA_LENGTH - wiadomosc dzielimy na pakiety o maksymalnie tej dlugosci
+# ENCODED_LENGTH - ilosc podlist zakodowanego ciagu (useless)
+# ENCODED_BITS - ilosc bitow w zakodowanym ciagu wraz z ciagiem oryginalnym
+# k - dlugosc ciagu informacyjnego
+# k = ENCODED_BITS - MAX_DATA_LENGTH
+
 #
-# bch = BCH(BCH_POLYNOMIAL, BCH_BITS)
-#
-# data = generator.generate_bits(10)
-# # data = list(os.urandom(10))
-# print(f'\nData:                      {data}')
-#
-# encoded = bch.encode(data)
-# print(f'Encoded (before channel):  {encoded}')
-#
-# decoded = bch.decode(encoded)
-# print(f'Decoded:                   {decoded}')
+
+
+# wnioski
+#   - wzrost zdolnosci korekcyjnej (BCH_BITS, t) sprawia, ze mozemy operowac na coraz mniejszych pakietach, natomiast dlugosc zakodowanej informacji sie zwieksza.
+#     Prawdopodobnie rosnie skutecznosc kodowania kosztem nadmiarowosci - sprawdzic. Znalezc optymalne dane.
+#   - dla x podzialow k trzeba pomnozyc przez x - znacznie to zwiekszy nadmiarowosc, ale wynika to z ograniczen implementacji
+
+
+

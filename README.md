@@ -310,7 +310,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.04).png>)
 
-   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.004).png?raw=true)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.04).png?raw=true)
 
    
 
@@ -348,7 +348,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
    ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png>)
    
-   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.04).png?raw=true)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.004).png?raw=true)
 
 
 

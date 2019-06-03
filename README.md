@@ -55,19 +55,17 @@ W skład kodów nadmiarowych wchodzą:
 
 Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrzenia danego ciągu w nadmiarową informację, którą uzyskuje się poprzez użycie kodów korekcyjnych.
 
-###### Wady FEC:
-
-- skomplikowane i czasochłonne metody korekcji błędów,
-- brak gwarancji skorygowania wszystkich błędów,
-- przy dużej liczbie błędów dekoder zamiast ją zmniejszać, może spowodować jej powiększenie.
-
 ###### Zalety FEC:
 
 - świetnie się sprawdza w korekcji błędów "na żywo", np. wideo, audio,
 - charakteryzuje się jednakowym opóźnieniem dla całego zestawu danych,
 - nie ma protokołu transmisyjnego.
 
+###### Wady FEC:
 
+- skomplikowane i czasochłonne metody korekcji błędów,
+- brak gwarancji skorygowania wszystkich błędów,
+- przy dużej liczbie błędów dekoder zamiast ją zmniejszać, może spowodować jej powiększenie.
 
 #### Model
 
@@ -81,18 +79,31 @@ Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
 Elementowa stopa błędów, wskaźnik określający prawdopodobieństwo wystąpienia zafałszowania bitu informacji w czasie transmisji danych. Z matematycznego punktu widzenia jest to stosunek liczby bitów odebranych błędnie do całkowitej liczby przesłanych bitów. W dzisiejszych systemach BER jest zależny od szybkości transmisji i od rezerwy mocy sygnału. Dobre jakościowo połączenie charakteryzuje się BER poniżej 10<sup>-10</sup>. W typowych kanałach zawiera się w przedziale <10<sup>-2</sup>, 10<sup>-5</sup>>. Dla transmisji danych wymagane jest BER ~ (10<sup>-6</sup>, 10<sup>-9</sup>).
 
+Zaimplementowane uniwersalne narzędzie do liczenia BER wykonuje logiczny XOR bitów na kolejnych pozycjach w oryginalnej wiadomości 
+i w wiadomości zdekodowanej po przejściu przez kanał, sprawdzając w ten sposób ich zgodność.
+
+```python
+def ber_triple(input, output):
+    wrong_bits = 0
+
+    for i in range(len(input)):
+        wrong_bits += (input[i] ^ output[i])
+
+    return wrong_bits / len(input)
+```
 
 #### Kod z powtórzeniem
 
-Jeden z najprostszych kodów korekcyjnych polegający na powtórzeniu danego bitu kilkukrotnie. Elementowa stopa błędu jest relatywnie niska, nie jest to niezawodna metoda, jednak sporo zyskuje dzięki swojej łatwości implementacji. 
+Jeden z najprostszych kodów korekcyjnych, polegający na powtórzeniu danego bitu kilkukrotnie - w projekcie testujemy kod potrajający bity. 
+Elementowa stopa błędu jest relatywnie niska, nie jest to niezawodna metoda, jednak sporo zyskuje dzięki swojej łatwości implementacji. 
 
 Przykład: 
 
-> Transmisja kodu o długości 3 - 101. Po powieleniu kazdego z bitów trzykrotnie uzyskujemy 111 000 111 i taki sygnał wysyłamy. Załóżmy, że wystąpiły błędy i odbiorca otrzymał 111 010 100. Sygnał dekodujemy zgodnie z zasadą większości, więc ostatecznym rezultatem jest 100. W tym przypadku jeden bit jest zafałszowany, jednak wiekszość odebranych bitów jest poprawna.
+> Transmisja kodu o długości 3: 101. Po powieleniu kazdego z bitów trzykrotnie uzyskujemy 111 000 111 i taki sygnał wysyłamy. Załóżmy, że wystąpiły błędy i odbiorca otrzymał 111 010 100. Sygnał dekodujemy zgodnie z zasadą większości, więc ostatecznym rezultatem jest 100. W tym przypadku jeden bit jest zafałszowany, jednak wiekszość odebranych bitów jest poprawna.
 
 
 
-W projekcie koder to `python comprehention` (nie ma odpowiednika w języku polskim), które potraja kazdy bit w danej liście bitów. Na potrzeby kanału zwracana jest numpy array.
+W projekcie koder to `python comprehension` (nie ma odpowiednika w języku polskim), które potraja kazdy bit w danej liście bitów. Na potrzeby kanału zwracana jest `numpy array`.
 
 ```python
 def code_triple(lst):
@@ -101,7 +112,7 @@ def code_triple(lst):
 
 
 
-Dekoder jest bardziej skomplikowany. Zewnętrzna pętla posiada krok równy 3. Za każdym obiegiem pętli tworzy nowy `Counter`, który zlicza wystąpienia 0 i 1. Kiedy juz wewnętrzna pętla obróci się 3 razy wybierany jest najpopularniejsza wartość. Owa wartość dodawana jest do wynikowej, zdekodowanej listy
+Dekoder jest bardziej skomplikowany. Zewnętrzna pętla posiada krok równy 3. Za każdym obiegiem pętli tworzy nowy `Counter`, który zlicza wystąpienia 0 i 1. Kiedy już wewnętrzna pętla obróci się 3 razy, wybierana jest popularniejsza wartość wśród badanych trzech bitów. Owa wartość dodawana jest do wynikowej, zdekodowanej listy, zachowujemy w ten sposób oryginalny rozmiar wiadomości.
 
 
 
@@ -121,21 +132,6 @@ def decode_triple(arr):
 
     return dec_lst
 ```
-
-
-
-Przy okazji testowania kodowania potrojeniowego zaimplementowano także uniwersalne narzędzie do liczenia BER. Robi ono XOR pomiędzy oryginalną wiadomością, a tym co zostało zdekodowane po przejściu przez kanał.
-
-```python
-def ber_triple(input, output):
-    wrong_bits = 0
-
-    for i in range(len(input)):
-        wrong_bits += (input[i] ^ output[i])
-
-    return wrong_bits / len(input)
-```
-
 
 
 #### Kod BCH (Bose-Chaudhuri-Hocquenghema)
@@ -178,9 +174,9 @@ Wykorzystana biblioteka:
 
 #### Kod Hamminga
 
-Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2 - 1, 2, 4, 8, 16...
+Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2: 1, 2, 4, 8, 16...
 
-W projekcie użyto gotowej implementacji kodu Hamminga (8,4): https://github.com/DakotaNelson/hamming-stego. Jako argument wejściowy przyjmuje liste bitów, zaś zwraca numpy array z zakodowanym ciągiem. W przypadku podania ciągu o długości niebędącej wielokrotnością liczby 4 dopełenia ją zerami np:
+W projekcie użyto gotowej implementacji kodu Hamminga (8,4): https://github.com/DakotaNelson/hamming-stego. Jako argument wejściowy przyjmuje listę bitów, zaś zwraca `numpy array` z zakodowanym ciągiem. W przypadku podania ciągu o długości, która nie jest wielokrotnością liczby 4, dopełenia go zerami, np:
 
 ```python
 >>> encode([1,1,1])
@@ -189,7 +185,7 @@ array([[1, 1, 1, 0, 0, 0, 0, 1]])
 
 
 
-Jego nadmiarowość wynosi 100%
+Jego nadmiarowość wynosi 100%.
 
 ### Modele kanałów
 
@@ -203,14 +199,34 @@ różnej jakości i sprawdziliśmy, w jakim stopniu uszkadzają one sygnał.
 
 ##### Binary Symmetric Channel (BSC) 
 W tym kanale podejmujemy decyzję, czy dany bit zostanie przekłamany, czy nie,
-na podstawie prostego losowania z rozkładu jedostajnego na przedziale [0,1]
+na podstawie prostego losowania z rozkładu jedostajnego na przedziale *[0,1)*
 z zadanym progowym prawdopodobieństwem błędu *p*, które dzieli przedział na dwie części.
 Jeśli wylosowana liczba znajdzie się poniżej progu, bit zostanie przekłamany,
 jeśli powyżej - przesłany poprawnie.
 
+Losowanie wartości `float` z przedziału *[0.0, 1.0)* zgodnie z rozkładem jednostajnym umożliwia funkcja
+`random()` z biblioteki `random`. Poniżej przedstawiony jest proces decyzyjny, czy dana wartość bitu z otrzymanej
+wejściowej (zakodowanej) `numpy array` zostanie w naszej symulacji kanału przesłana poprawnie, czy przekłamana 
+(dołączamy ją do wyjściowej `numpy array`).
+
+
+```python
+if random() < p_of_error:
+    if input_array[i][j] == 0:
+        output_array[i][j] = 1
+    else:
+        output_array[i][j] = 0
+else:
+    output_array[i][j] = input_array[i][j]
+```
+
+Przy użyciu tego kanału wykonaliśmy testy jedynie w początkowej fazie projektu 
+i nie zawarliśmy ich analizy w sprawozdaniu ze względu na fakt, że
+przedstawiony poniżej model Gilberta-Elliotta jest przy pewnych wartościach parametrów niemal równoważny z BSC.
+
 ##### Model Gilberta-Elliotta
 Bardziej złożoną symulacją jest model GIlberta-Elliotta. Jest oparty o łańcuch
-Markowa z dowma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo
+Markowa z dwoma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo
 błędu jest mniejsze i wynosi *1-k*, w złym stanie jest większe i wynosi *1-h* (*k* i *h* to odpowiednie 
 prawdopodobieństwa poprawnej transmisji bitu), w danym stanie
 decyzja o błędzie jest podejmowana jak w *BSC*. Poza tym ustalamy prawdopodobieństwo 
@@ -218,6 +234,33 @@ przejścia ze stanu dobrego do złego (*p*) i ze stanu złego do dobrego (*r*).
 Ten model pozwala dość dobrze symulować błędy grupowe.
 
  ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/gilbert.png?raw=true)
+
+Procedura pamięta, w którym aktualnie stanie znajduje się kanał, i na postawie prawdopodobieństwa błędu dla obecnego stanu 
+przeprowadza proces decyzyjny dokładnie taki sam jak w kanale BSC - bit zostanie wysłany poprawnie lub niepoprawnie.
+Następnie funkcja `random()` ponownie losuje wartość, która jest porównana z prawdopodobieństem przejścia do stanu
+przeciwnego - na tej podstawie aktualny stan zostanie zachowany lub zmieniony, po czym przejdziemy do kolejnego obiegu
+pętli i przesłania następnego bitu na takiej samej zasadzie.
+
+```python
+if good_state: # jestesmy w dobrym stanie
+    if random() < p_of_error_when_good:
+        if input_array[i][j] == 0:
+            output_array[i][j] = 1
+        else:
+            output_array[i][j] = 0
+    else:
+        output_array[i][j] = input_array[i][j]
+    good_state = random() > p_of_good_to_bad
+else: # jestesmy w zlym stanie
+    if random() < p_of_error_when_bad:
+        if input_array[i][j] == 0:
+            output_array[i][j] = 1
+        else:
+            output_array[i][j] = 0
+    else:
+        output_array[i][j] = input_array[i][j]
+    good_state = random() > (1 - p_of_bad_to_good)
+```
 
 ### Narzędzia do analizy danych
 
@@ -239,14 +282,31 @@ W projekcie skorzystano z biblioteki `matplotlib`.  Działa w sposób bardzo pod
 
 ## Wyniki badań
 
-Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez kanał ciągi kodowane kodem potrojeniowym, Hamminga oraz BCH. Zmienialiśmy cztery różne parametry kanału:
+Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez kanał ciągi kodowane kodem potrojeniowym, Hamminga oraz BCH.
+Zmienialiśmy cztery różne parametry kanału:
 
 * *1-k* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie dobrym,
 * *p* - prawdopodobieństwo przejścia ze stanu dobrego do złego,
 * *1-h* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, >
 * *r* - prawdopodobieństwo przejścia ze stanu złego do dobrego.
 
-Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
+Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym. Dla każdego z tych ustawień wykonaliśmy dwa wykresy
+ilustrujące zależności, które chcieliśmy zbadać.
+
+Pierwszy wykres z pary to zależność BER w danym kanale od długości przesyłanej wiadomości. Testowaliśmy tutaj kodowanie
+potrojeniowe, kodowanie Hamminga(8,4) oraz kodowanie BCH(,). Badanych długości wiadomości było dziesięć
+(co 100 000 bitów, od 100 000 bitów  do 1 000 000 bitów). Dla każdej długości zostało wygenerowane dziesięć losowych wiadomości,
+które zostały następnie zakodowane, przesłane i odkodowane. Wartość BER przyporządkowana na wykresie danej długości wiadomości
+to średnia arytmetyczna dziesięciu wartości BER dla owych losowych ciągów wejściowych.
+
+Drugi wykres z pary to ilustracja zależności pomiędzy BER a nadmiarowością danego kodowania. Przez nadmiarowość rozumiemy
+liczbę rzeczywistą, która mówi, ile razy dłuższa od informacyjnej wiadomości jest wiadomość zakodowana (gotowa już do przesłania
+przez kanał), jak duży jest narzut dodatkowych bitów. Testowaliśmy tutaj kodowanie potrojeniowe, kodowanie Hamminga(8,4) oraz
+kodowanie BCH w czterech wersjach: (1120,1007), (1510,1024), (1980,864), (2870,718). W każdej parze *(n,k)* *n* oznacza długość
+całkowitą słowa po zakodowaniu, a *k* to liczba bitów informacyjnych - nadmiarowość liczymy jako iloraz *n/k*, jest to oczywiście
+stała wartość dla danego kodowania. Badaliśmy wiadomości o długości 1 000 000 bitów, znów generując po dziesięć
+losowych ciągów i uśredniając BER widoczny na wykresach.
+   
 
 1. prawie idealny: `1-k = 0.000001`,  `p = 0.000101648`,  `1-h = 0.31`, `r = 0.914789`
 
@@ -418,6 +478,8 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 ### Wnioski
 
+##### Zależność BER od długości wiadomości
+
 W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy, tym lepszy), pozioma natomiast oznacza długość wiadomości - 
 liczbę bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, 
 które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** 
@@ -431,3 +493,8 @@ Najlepsze wyniki pod względem występującego współczynnika błędu, niezale�
 Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. 
 Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego 
 przy kodowaniu potrojeniowym czy też Hamminga.
+
+Warto też zauważyć, że rosnąca długość wiadomości nie wiązała się ze znaczącym wzrostem BER - niewielkich fluktuacji nie bierzemy pod uwagę.
+Pozwala to wnioskować, że dla danych parametrów kanału i danego kodowania BER jest funkcją w przybliżeniu stałą.
+
+##### Zestawienie nadmiarowości 

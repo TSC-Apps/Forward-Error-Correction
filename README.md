@@ -71,7 +71,7 @@ Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrze
 
 #### Model
 
-![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/model.png>)
+![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/model.png?raw=true)
 
 Kanał transmisyjny jest zaburzany przez losowe zakłócenia.
 
@@ -89,6 +89,52 @@ Jeden z najprostszych kodów korekcyjnych polegający na powtórzeniu danego bit
 Przykład: 
 
 > Transmisja kodu o długości 3 - 101. Po powieleniu kazdego z bitów trzykrotnie uzyskujemy 111 000 111 i taki sygnał wysyłamy. Załóżmy, że wystąpiły błędy i odbiorca otrzymał 111 010 100. Sygnał dekodujemy zgodnie z zasadą większości, więc ostatecznym rezultatem jest 100. W tym przypadku jeden bit jest zafałszowany, jednak wiekszość odebranych bitów jest poprawna.
+
+
+
+W projekcie koder to `python comprehention` (nie ma odpowiednika w języku polskim), które potraja kazdy bit w danej liście bitów. Na potrzeby kanału zwracana jest numpy array.
+
+```python
+def code_triple(lst):
+    return array([[i for i in lst for j in range(0, 3)]])
+```
+
+
+
+Dekoder jest bardziej skomplikowany. Zewnętrzna pętla posiada krok równy 3. Za każdym obiegiem pętli tworzy nowy `Counter`, który zlicza wystąpienia 0 i 1. Kiedy juz wewnętrzna pętla obróci się 3 razy wybierany jest najpopularniejsza wartość. Owa wartość dodawana jest do wynikowej, zdekodowanej listy
+
+
+
+```python
+def decode_triple(arr):
+    dec_lst = []
+    lst = arr[0]
+    for i in range(0, len(lst), 3):
+        counter = Counter()
+        for j in range(0, 3):
+            counter[lst[i + j]] += 1
+
+        # zabieg konieczny ze wzgledu na zwracanie przez most_commot listy krotek
+        val, times = zip(*counter.most_common())
+        dec_lst.append(val[0])
+        counter.clear()
+
+    return dec_lst
+```
+
+
+
+Przy okazji testowania kodowania potrojeniowego zaimplementowano także uniwersalne narzędzie do liczenia BER. Robi ono XOR pomiędzy oryginalną wiadomością, a tym co zostało zdekodowane po przejściu przez kanał.
+
+```python
+def ber_triple(input, output):
+    wrong_bits = 0
+
+    for i in range(len(input)):
+        wrong_bits += (input[i] ^ output[i])
+
+    return wrong_bits / len(input)
+```
 
 
 
@@ -130,20 +176,20 @@ Wykorzystana biblioteka:
 
 
 
-
-
-
-
-
-
 #### Kod Hamminga
 
 Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2 - 1, 2, 4, 8, 16...
 
-Wykorzystana biblioteka:
+W projekcie użyto gotowej implementacji kodu Hamminga (8,4): https://github.com/DakotaNelson/hamming-stego. Jako argument wejściowy przyjmuje liste bitów, zaś zwraca numpy array z zakodowanym ciągiem. W przypadku podania ciągu o długości niebędącej wielokrotnością liczby 4 dopełenia ją zerami np:
 
-> <https://pypi.org/project/libhamming/>
+```python
+>>> encode([1,1,1])
+array([[1, 1, 1, 0, 0, 0, 0, 1]])
+```
 
+
+
+Jego nadmiarowość wynosi 100%
 
 ### Modele kanałów
 
@@ -171,7 +217,25 @@ decyzja o błędzie jest podejmowana jak w *BSC*. Poza tym ustalamy prawdopodobi
 przejścia ze stanu dobrego do złego (*p*) i ze stanu złego do dobrego (*r*). 
 Ten model pozwala dość dobrze symulować błędy grupowe.
 
- ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/gilbert.png>)
+ ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/gilbert.png?raw=true)
+
+### Narzędzia do analizy danych
+
+W projekcie skorzystano z biblioteki `matplotlib`.  Działa w sposób bardzo podobny do matlaba: należy ustalić zawartość osi x i y, ich etykietę, tytuł wykresu, etc np:
+
+```python
+	plt.plot([sum6/10], [2870 / 718], label='Kodowanie BCH(2870, 718)', marker='o')
+
+    plt.title('Zestawienie nadmiarowości z BER różnych kodowań')
+    plt.xlabel('BER')
+    plt.ylabel('Nadmiarowość')
+    plt.grid(linestyle='-', linewidth=0.5)	# tworzy siatke
+    plt.legend() # tworzy legende na wykresie
+    plt.savefig('gilbert_ber_err_prob=' + str(parameter_list) + '.png')
+
+```
+
+
 
 ## Wyniki badań
 
@@ -179,14 +243,14 @@ Badania przeprowadziliśmy na kanale Gilberta. Kolejno przepuszczaliśmy przez k
 
 * *1-k* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie dobrym,
 * *p* - prawdopodobieństwo przejścia ze stanu dobrego do złego,
-* *1-h* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, 
+* *1-h* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, >
 * *r* - prawdopodobieństwo przejścia ze stanu złego do dobrego.
 
 Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 1. prawie idealny: `1-k = 0.000001`,  `p = 0.000101648`,  `1-h = 0.31`, `r = 0.914789`
 
-   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(1e-06%2C%200.000101648%2C%200.31%2C%200.914789).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(1e-06%2C%200.000101648%2C%200.31%2C%200.914789).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(1e-06,%200.000101648,%200.31,%200.914789).png?raw=true)
 
@@ -194,7 +258,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 2. dobry: `1-k = 0.000053513`, `p = 0.000196854`, `1-h =0.65`, `r = 0.509547`
 
-   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.000196854%2C%200.65%2C%200.509547).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.000196854%2C%200.65%2C%200.509547).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(5.3513e-05,%200.000196854,%200.65,%200.509547).png?raw=true)
 
@@ -232,7 +296,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 3. niezły: `1-k = 0.0003631513`, `p = 0.000396854`, `1-h = 0.9`, `r = 0.2768`
 
-   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.000396854%2C%200.9%2C%200.2768).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.000396854%2C%200.9%2C%200.2768).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.000396854,%200.9,%200.2768).png?raw=true)
 
@@ -270,7 +334,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 4. średni: `1-k = 0.000053513`,  `p = 0.00496854`, `1-h = 0.9`, `r = 0.2768`
 
-   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.00496854%2C%200.9%2C%200.2768).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.00496854%2C%200.9%2C%200.2768).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(5.3513e-05,%200.00496854,%200.9,%200.2768).png?raw=true)
 
@@ -308,7 +372,7 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 5. zły: `1-k = 0.0003631513`, `p = 0.00496854`, `1-h = 0.99999`, `r = 0.04`
 
-   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.04).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.04).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.04).png?raw=true)
 
@@ -346,11 +410,13 @@ Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym:
 
 6. fatalny: `1-k = 0.0003631513`, `p = 0.00496854`, `1-h = 0.99999`, `r = 0.004`
 
-   ![](<https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png>)
+   ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png?raw=true)
    
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.004).png?raw=true)
 
 
+
+### Wnioski
 
 W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy, tym lepszy), pozioma natomiast oznacza długość wiadomości - 
 liczbę bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, 
@@ -365,20 +431,3 @@ Najlepsze wyniki pod względem występującego współczynnika błędu, niezale�
 Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. 
 Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego 
 przy kodowaniu potrojeniowym czy też Hamminga.
-
-## Notatki z 8 maja
-
-- 12.06. - przedstawienie projektu
-#### Kolejny etap 
-
-- zestawiamy koszt uzyskania danej nadmiarowości z jej skutecznością i wizualizujemy,
-- testy dla ustalonej długości wiadomości na osi *x*, tniemy obecne wykresy pionowo,
-- paramtery charakteryzujące - BER na osi *x*, nadmiarowość *α* na osi *y*, gdzie
-*α = (n-k)/n*, k to długość oryginalnej wiadomości, n - zakodowanej wiadomości, 
-n-k - nadmiarowość lub (?) przesyłamy *m* bitów wiadomości i *αm* wpuszczamy do kanału, 
-- ustawienia kodera i dekodera wpływają na jakość transmisji,
-- badamy rodzinę kodów BCH lub Hamminga, manipulując w ustawieniach kodera wartościami *k* i *n*,
-dobieramy najlepsze parametry, czy da się przywrócić/ulepszyć BCH,
-- na wykresie zależności BER (oś *x*) i *α* (oś *y*) wprowadzamy jakieś kryterium wyboru najlepszego z otrzymanych punktów,
-pionowa granica będzie oznaczać maksymalną stopę błędów, pozioma granica zadaje minimalną prędkość transmisji,
-chcemy minimalizować stopę błędów, jednocześnie maksymalizując prędkość transmisji.  

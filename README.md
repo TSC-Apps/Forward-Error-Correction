@@ -216,7 +216,7 @@ Wszelkie operacje, które wybrana biblioteka pozwala wykonać na ciągu danych z
 
 Metody konwertują ciągi na struktury, które przyjmuje biblioteka i wtedy dopiero wykonywane są konkretne operacje.
 
-Obiekty klasy są tworzone przy pomocy konstruktora, który jako argumenty przyjmuje wielomian, na podstawie którego automatycznie wyznaczanie jest ciało Galois, oraz parametr t symbolizujący zdolność korekcyjną. Podanie parametru p - polynomial jest z punktu widzenia implementacji biblioteki nieobligatoryjne. Próby jego zmiany kończyły się fiaskiem, więc zawsze ostatecznie zawsze jest taki sam i wynosi 8219 (propozycja autora biblioteki).
+Obiekty klasy są tworzone przy pomocy konstruktora, który jako argumenty przyjmuje wielomian, na podstawie którego automatycznie wyznaczanie jest ciało Galois, oraz parametr t symbolizujący zdolność korekcyjną. Podanie parametru p - polynomial z punktu widzenia implementacji biblioteki jest nieobligatoryjne. Próby jego zmiany kończyły się fiaskiem, więc zawsze ostatecznie zawsze jest taki sam i wynosi 8219 (propozycja autora biblioteki).
 
 ```python
 class BCH:
@@ -270,7 +270,7 @@ class BCH:
 
 #### Kod Hamminga
 
-Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2: 1, 2, 4, 8, 16...
+Koryguje błędy polegające na przekłamaniu jednego bitu poprzez użycie dodatkowych bitów parzystości. Odległość Hamminga (liczba pozycji, na których dane ciągi bitów się różnią) między słowami  transmitowanymi i odbieranymi powinna wynosić 0 lub 1. Bity kontrolne znajdują się na pozycjach będących potęgami liczby 2: 1, 2, 4, 8, 16...
 
 W projekcie użyto gotowej implementacji kodu Hamminga (8,4): https://github.com/DakotaNelson/hamming-stego. Jako argument wejściowy przyjmuje listę bitów, zaś zwraca `numpy array` z zakodowanym ciągiem. W przypadku podania ciągu o długości, która nie jest wielokrotnością liczby 4, dopełenia go zerami, np:
 
@@ -287,28 +287,16 @@ Jego nadmiarowość wynosi 100%.
 
 ### Modele kanałów
 
-W projekcie zaimplementowaliśmy dwa modele kanałów, za pośrecnictwem których
-przesyłany jest ciąg bitów powstały w wyniku zakodowania wiadomości. Podczas transmisji 
-na sygnał wpływają zakłócenia, co prowadzi do tego, że niektóre bity mogą 
-zostać błędnie odebrane po transmisji, a co za tym idzie, wiadomość zostanie
-niepoprawnie zdekodowana. Dobierając eksperymentalnie właściwe
-dla danego modelu prawdopodobieństwa przekłamań, zasymulowaliśmy kanały
-różnej jakości i sprawdziliśmy, w jakim stopniu uszkadzają one sygnał.
+W projekcie zaimplementowaliśmy dwa modele kanałów, za pośrecnictwem których przesyłany jest ciąg bitów powstały w wyniku zakodowania wiadomości. Podczas transmisji na sygnał wpływają zakłócenia, co prowadzi do tego, że niektóre bity mogą zostać błędnie odebrane po transmisji, a co za tym idzie, wiadomość zostanie niepoprawnie zdekodowana. Dobierając eksperymentalnie właściwe dla danego modelu prawdopodobieństwa przekłamań, zasymulowaliśmy kanały różnej jakości i sprawdziliśmy, w jakim stopniu uszkadzają one sygnał.
 
 
 
 ##### Binary Symmetric Channel (BSC) 
 
-W tym kanale podejmujemy decyzję, czy dany bit zostanie przekłamany, czy nie,
-na podstawie prostego losowania z rozkładu jedostajnego na przedziale *[0,1)*
-z zadanym progowym prawdopodobieństwem błędu *p*, które dzieli przedział na dwie części.
-Jeśli wylosowana liczba znajdzie się poniżej progu, bit zostanie przekłamany,
-jeśli powyżej - przesłany poprawnie.
+W tym kanale podejmujemy decyzję, czy dany bit zostanie przekłamany, czy nie, na podstawie prostego losowania z rozkładu jedostajnego na przedziale *[0,1)* z zadanym progowym prawdopodobieństwem błędu *p*, które dzieli przedział na dwie części. Jeśli wylosowana liczba znajdzie się poniżej progu, bit zostanie przekłamany, jeśli powyżej - przesłany poprawnie.
 
 Losowanie wartości `float` z przedziału *[0.0, 1.0)* zgodnie z rozkładem jednostajnym umożliwia funkcja
-`random()` z biblioteki `random`. Poniżej przedstawiony jest proces decyzyjny, czy dana wartość bitu z otrzymanej
-wejściowej (zakodowanej) `numpy array` zostanie w naszej symulacji kanału przesłana poprawnie, czy przekłamana 
-(dołączamy ją do wyjściowej `numpy array`).
+`random()` z biblioteki `random`. Poniżej przedstawiony jest proces decyzyjny, czy dana wartość bitu z otrzymanej wejściowej (zakodowanej) `numpy array` zostanie w naszej symulacji kanału przesłana poprawnie, czy przekłamana (dołączamy ją do wyjściowej `numpy array`).
 
 
 ```python
@@ -321,29 +309,19 @@ else:
     output_array[i][j] = input_array[i][j]
 ```
 
-Przy użyciu tego kanału wykonaliśmy testy jedynie w początkowej fazie projektu 
-i nie zawarliśmy ich analizy w sprawozdaniu ze względu na fakt, że
-przedstawiony poniżej model Gilberta-Elliotta jest przy pewnych wartościach parametrów niemal równoważny z BSC.
+Przy użyciu tego kanału wykonaliśmy testy jedynie w początkowej fazie projektu i nie zawarliśmy ich analizy w sprawozdaniu ze względu na fakt, że przedstawiony poniżej model Gilberta-Elliotta jest przy pewnych wartościach parametrów niemal równoważny z BSC.
 
 
 
 ##### Model Gilberta-Elliotta
 
-Bardziej złożoną symulacją jest model GIlberta-Elliotta. Jest oparty o łańcuch
-Markowa z dwoma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo
-błędu jest mniejsze i wynosi *1-k*, w złym stanie jest większe i wynosi *1-h* (*k* i *h* to odpowiednie 
-prawdopodobieństwa poprawnej transmisji bitu), w danym stanie
-decyzja o błędzie jest podejmowana jak w *BSC*. Poza tym ustalamy prawdopodobieństwo 
-przejścia ze stanu dobrego do złego (*p*) i ze stanu złego do dobrego (*r*). 
-Ten model pozwala dość dobrze symulować błędy grupowe.
+Bardziej złożoną symulacją jest model GIlberta-Elliotta. Jest oparty o łańcuch Markowa z dwoma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo błędu jest mniejsze i wynosi *1-k*, w złym stanie jest większe i wynosi *1-h* (*k* i *h* to odpowiednie prawdopodobieństwa poprawnej transmisji bitu), w danym stanie decyzja o błędzie jest podejmowana jak w *BSC*. Poza tym ustalamy prawdopodobieństwo 
+przejścia ze stanu dobrego do złego (*p*) i ze stanu złego do dobrego (*r*). Ten model pozwala dość dobrze symulować błędy grupowe.
 
  ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/270a9ac5fbb9681e9648337f29b94021fad8f48f/gilbert.png?raw=true)
 
-Procedura pamięta, w którym aktualnie stanie znajduje się kanał, i na postawie prawdopodobieństwa błędu dla obecnego stanu 
-przeprowadza proces decyzyjny dokładnie taki sam jak w kanale BSC - bit zostanie wysłany poprawnie lub niepoprawnie.
-Następnie funkcja `random()` ponownie losuje wartość, która jest porównana z prawdopodobieństem przejścia do stanu
-przeciwnego - na tej podstawie aktualny stan zostanie zachowany lub zmieniony, po czym przejdziemy do kolejnego obiegu
-pętli i przesłania następnego bitu na takiej samej zasadzie.
+Procedura pamięta, w którym aktualnie stanie znajduje się kanał, i na postawie prawdopodobieństwa błędu dla obecnego stanu przeprowadza proces decyzyjny dokładnie taki sam jak w kanale BSC - bit zostanie wysłany poprawnie lub niepoprawnie.
+Następnie funkcja `random()` ponownie losuje wartość, która jest porównana z prawdopodobieństem przejścia do stanu przeciwnego - na tej podstawie aktualny stan zostanie zachowany lub zmieniony, po czym przejdziemy do kolejnego obiegu pętli i przesłania następnego bitu na takiej samej zasadzie.
 
 ```python
 if good_state: # jestesmy w dobrym stanie
@@ -396,21 +374,13 @@ Zmienialiśmy cztery różne parametry kanału:
 * *1-h* - prawdopodobieństwo wystąpienia błędu, jeśli kanał znajduje się w stanie złym, >
 * *r* - prawdopodobieństwo przejścia ze stanu złego do dobrego.
 
-Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym. Dla każdego z tych ustawień wykonaliśmy dwa wykresy
-ilustrujące zależności, które chcieliśmy zbadać.
+Wybraliśmy sześć różnych ustawień kanału pod względem jakościowym. Dla każdego z tych ustawień wykonaliśmy dwa wykresy ilustrujące zależności, które chcieliśmy zbadać.
 
-Pierwszy wykres z pary to zależność BER w danym kanale od długości przesyłanej wiadomości. Testowaliśmy tutaj kodowanie
-potrojeniowe, kodowanie Hamminga(8,4) oraz kodowanie BCH(,). Badanych długości wiadomości było dziesięć
-(co 100 000 bitów, od 100 000 bitów  do 1 000 000 bitów). Dla każdej długości zostało wygenerowane dziesięć losowych wiadomości,
-które zostały następnie zakodowane, przesłane i odkodowane. Wartość BER przyporządkowana na wykresie danej długości wiadomości
+Pierwszy wykres z pary to zależność BER w danym kanale od długości przesyłanej wiadomości. Testowaliśmy tutaj kodowanie potrojeniowe, kodowanie Hamminga(8,4) oraz kodowanie BCH(,). Badanych długości wiadomości było dziesięć (co 100 000 bitów, od 100 000 bitów  do 1 000 000 bitów). Dla każdej długości zostało wygenerowane dziesięć losowych wiadomości, które zostały następnie zakodowane, przesłane i odkodowane. Wartość BER przyporządkowana na wykresie danej długości wiadomości
 to średnia arytmetyczna dziesięciu wartości BER dla owych losowych ciągów wejściowych.
 
-Drugi wykres z pary to ilustracja zależności pomiędzy BER a nadmiarowością danego kodowania. Przez nadmiarowość rozumiemy
-liczbę rzeczywistą, która mówi, ile razy dłuższa od informacyjnej wiadomości jest wiadomość zakodowana (gotowa już do przesłania
-przez kanał), jak duży jest narzut dodatkowych bitów. Testowaliśmy tutaj kodowanie potrojeniowe, kodowanie Hamminga(8,4) oraz
-kodowanie BCH w czterech wersjach: (1120,1007), (1510,1024), (1980,864), (2870,718). W każdej parze *(n,k)* *n* oznacza długość
-całkowitą słowa po zakodowaniu, a *k* to liczba bitów informacyjnych - nadmiarowość liczymy jako iloraz *n/k*, jest to oczywiście
-stała wartość dla danego kodowania. Badaliśmy wiadomości o długości 1 000 000 bitów, znów generując po dziesięć
+Drugi wykres z pary to ilustracja zależności pomiędzy BER a nadmiarowością danego kodowania. Przez nadmiarowość rozumiemy liczbę rzeczywistą, która mówi, ile razy dłuższa od informacyjnej wiadomości jest wiadomość zakodowana (gotowa już do przesłania
+przez kanał), jak duży jest narzut dodatkowych bitów. Testowaliśmy tutaj kodowanie potrojeniowe, kodowanie Hamminga(8,4) oraz kodowanie BCH w czterech wersjach: (1120,1007), (1510,1024), (1980,864), (2870,718). W każdej parze *(n,k)* *n* oznacza długość całkowitą słowa po zakodowaniu, a *k* to liczba bitów informacyjnych - nadmiarowość liczymy jako iloraz *n/k*, jest to oczywiście stała wartość dla danego kodowania. Badaliśmy wiadomości o długości 1 000 000 bitów, znów generując po dziesięć
 losowych ciągów i uśredniając BER widoczny na wykresach.
 
 
@@ -592,7 +562,6 @@ W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy,
 
 Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga.
 
-Warto też zauważyć, że rosnąca długość wiadomości nie wiązała się ze znaczącym wzrostem BER - niewielkich fluktuacji nie bierzemy pod uwagę.
-Pozwala to wnioskować, że dla danych parametrów kanału i danego kodowania BER jest funkcją w przybliżeniu stałą.
+Warto też zauważyć, że rosnąca długość wiadomości nie wiązała się ze znaczącym wzrostem BER - niewielkich fluktuacji nie bierzemy pod uwagę. Pozwala to wnioskować, że dla danych parametrów kanału i danego kodowania BER jest funkcją w przybliżeniu stałą.
 
 ##### Zestawienie nadmiarowości 

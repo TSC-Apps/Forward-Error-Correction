@@ -64,8 +64,12 @@ Technika służąca do korygowania błędów w tramisji danych kosztem zaopatrze
 ###### Wady FEC:
 
 - skomplikowane i czasochłonne metody korekcji błędów,
+
 - brak gwarancji skorygowania wszystkich błędów,
+
 - przy dużej liczbie błędów dekoder zamiast ją zmniejszać, może spowodować jej powiększenie.
+
+  
 
 #### Model
 
@@ -91,6 +95,8 @@ def ber_triple(input, output):
 
     return wrong_bits / len(input)
 ```
+
+
 
 #### Kod z powtórzeniem
 
@@ -134,7 +140,10 @@ def decode_triple(arr):
 ```
 
 
+
 #### Kod BCH (Bose-Chaudhuri-Hocquenghema)
+
+###### Krótka teoria
 
 Kody cykliczne, czyli wielomianowe o długości słowa kodowego n, których wielomian generujący g(x) jest dzielnikiem wielomianu x<sup>n</sup>+1, o zmiennej długości, służące do korekcji błędów losowych, w przybliżeniu do 25% całkowitej liczby cyfr.
 
@@ -148,15 +157,11 @@ lub
 
 Dla każdej liczby całkowitej m i t < 2<sup>m-1</sup> istnieje kod bch o długości n = 2<sup>m</sup> - 1. Może on korygować do t błędów i ma nie więcej niż m*t elementów kontrolnych.
 
-
-
 > n = 2<sup>m</sup> - 1
 >
 > k >= n - m*t
 >
 > d<sub>min</sub> >= 2t + 1
-
-
 
 gdzie: 
 n - długość wektora kodowego,
@@ -166,9 +171,100 @@ t - zdolność korekcji błędów.
 
 
 
-Wykorzystana biblioteka:
+###### Wykorzystana biblioteka:
 
 > <https://github.com/jkent/python-bchlib>
+
+
+
+###### Badania, parametry
+
+Przy badaniu skuteczności BCH sterowaliśmy parametrami kanału, długością informacji, którą chcemy zakodować, oraz zdolnością korekcji błędów - ilością bitów, które maksymalnie kodowanie BCH jest w stanie naprawić. Ze względu na ograniczenia wykorzystanej implementacji danego kodowania korekcyjnego, przy dużej informacji do przetworzenia biblioteka odmawiała współpracy, ciąg wejściowy został podzielony na pakiety. Każdy z nich z osobna został przepuszczony przez wybrany kanał, zakodowany i następnie odkodowany. Ostatecznie wszystkie złączono w jeden ciąg wyjściowy, na którego podstawie obliczono współczynnik błędu (BER) dla danych parametrów kodowania i kanału. 
+
+Ilość pozycji kontrolnych (nadmiarowość) w zakodowanej informacji została zbadana eksperymentalnie poprzez dobieranie parametru `t` - zdolności korekcyjnej błędów. Od tego samego parametru zależała również ilość bitów w pojedynczym pakiecie - im większe `t`, tym mniejsze pakiety. Co istotne, wraz ze wzrostem skuteczności kodowania, czyli zwiększeniem zdolności korekcyjnej `t`, rosła długość zakodowanej informacji - ilość pozycji kontrolnych. Innymi słowy, przy zwiększaniu parametru t wystąpił zauważalny wzrost efektywności kodowania kosztem nadmiarowości.
+
+Tabela powstała w trakcie przeprowadzania eksperymentów na wykorzystanej implementacji bibliotekii kodowania BCH:
+
+```
++--------------+-----------------+-------------------------+-----------------------------+
+| BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_BITS            | n - k                       |
+| zdolność     | w pojedynczym   | ilosc bitow             | liczba pozycji kontrolnych  |
+| korekcyjna   | pakiecie        | zakodowanej informacji  |                             |
++--------------+-----------------+-------------------------+-----------------------------+
+| 10           | 1007            | 1120                    | 113                         |
+| 50           | 942             | 1510                    | 568                         |
+| 100          | 864             | 1980                    | 1116                        |
+| 200          | 718             | 2870                    | 2006                        |
+| 500          | 362             | 5150                    | 4788                        |
+| 630          | 297             | 5680                    | 5383                        |
++--------------+-----------------+-------------------------+-----------------------------+
+```
+
+* `BCH_BITS` - `t`, zdolność korekcji błędów, maksymalna liczba bitów, które można naprawić,
+* `MAX_DATA_LENGTH` - maksymalna ilość bitów w pojedynczym pakiecie,
+* `ENCODED_BITS` - ilość bitów całej zakodowanej informacji (informacja początkowa + pozycje kontrolne),
+* `n - k` - liczba pozycji kontrolnych, `n-k` = `ENCODED_BITS` - `MAX_DATA_LENGTH`.
+
+
+
+###### Aspekty techniczne
+
+Wszelkie operacje, które wybrana biblioteka pozwala wykonać na ciągu danych zostały zebrane w klasie BCH celem zachowania porządku oraz spójności struktur. Są to kolejno: 
+
+* zakodowanie informacji (encode), 
+* odkodowanie informacji (decode).
+
+Metody konwertują ciągi na struktury, które przyjmuje biblioteka i wtedy dopiero wykonywane są konkretne operacje.
+
+Obiekty klasy są tworzone przy pomocy konstruktora, który jako argumenty przyjmuje wielomian, na podstawie którego automatycznie wyznaczanie jest ciało Galois, oraz parametr t symbolizujący zdolność korekcyjną. Podanie parametru p - polynomial jest z punktu widzenia implementacji biblioteki nieobligatoryjne. Próby jego zmiany kończyły się fiaskiem, więc zawsze ostatecznie zawsze jest taki sam i wynosi 8219 (propozycja autora biblioteki).
+
+```python
+class BCH:
+    def __init__(self, p, t):
+        self.bch_polynomial = p
+        self.bch_bits = t
+        self.bitflips = 0
+
+        # utworzenie obiektu klasy z biblioteki bchlib
+        self.obj = bchlib.BCH(self.bch_polynomial, self.bch_bits)
+        # self.boj = bchlib.BCH.__init__()
+
+    def encode(self, data):
+        # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
+        data = bytearray(data)
+
+        # zakodowanie ciagu danych
+        data_enc = self.obj.encode(data)
+
+        # utworzenie pakietu
+        packet = data + data_enc
+
+        lst = dec_to_bin(list(packet))
+
+        return lst
+
+    def decode(self, packet):
+        # konwersja binary -> dec
+        packet = bin_to_dec(packet)
+
+        # konwersja listy do bytearray (na potrzeby biblioteki bchlib)
+        packet = bytearray(packet)
+
+        # rozpakowanie pakietu
+        data, data_enc = packet[:-self.obj.ecc_bytes], packet[-self.obj.ecc_bytes:]
+
+        # odkodowanie
+        try:
+            decoded = self.obj.decode(data, data_enc)
+
+            self.bitflips = decoded[0]
+            data_dec = decoded[1]
+            # data_enc = decoded[2]
+
+            return list(data_dec)
+        except:
+            print('Nie udalo sie odkodowac ciagu danych.')
+```
 
 
 
@@ -187,6 +283,8 @@ array([[1, 1, 1, 0, 0, 0, 0, 1]])
 
 Jego nadmiarowość wynosi 100%.
 
+
+
 ### Modele kanałów
 
 W projekcie zaimplementowaliśmy dwa modele kanałów, za pośrecnictwem których
@@ -197,7 +295,10 @@ niepoprawnie zdekodowana. Dobierając eksperymentalnie właściwe
 dla danego modelu prawdopodobieństwa przekłamań, zasymulowaliśmy kanały
 różnej jakości i sprawdziliśmy, w jakim stopniu uszkadzają one sygnał.
 
+
+
 ##### Binary Symmetric Channel (BSC) 
+
 W tym kanale podejmujemy decyzję, czy dany bit zostanie przekłamany, czy nie,
 na podstawie prostego losowania z rozkładu jedostajnego na przedziale *[0,1)*
 z zadanym progowym prawdopodobieństwem błędu *p*, które dzieli przedział na dwie części.
@@ -224,7 +325,10 @@ Przy użyciu tego kanału wykonaliśmy testy jedynie w początkowej fazie projek
 i nie zawarliśmy ich analizy w sprawozdaniu ze względu na fakt, że
 przedstawiony poniżej model Gilberta-Elliotta jest przy pewnych wartościach parametrów niemal równoważny z BSC.
 
+
+
 ##### Model Gilberta-Elliotta
+
 Bardziej złożoną symulacją jest model GIlberta-Elliotta. Jest oparty o łańcuch
 Markowa z dwoma stanami *G* (*good*) i B (*bad*). W dobrym stanie *G* prawdopodobieństwo
 błędu jest mniejsze i wynosi *1-k*, w złym stanie jest większe i wynosi *1-h* (*k* i *h* to odpowiednie 
@@ -261,6 +365,8 @@ else: # jestesmy w zlym stanie
         output_array[i][j] = input_array[i][j]
     good_state = random() > (1 - p_of_bad_to_good)
 ```
+
+
 
 ### Narzędzia do analizy danych
 
@@ -306,7 +412,9 @@ kodowanie BCH w czterech wersjach: (1120,1007), (1510,1024), (1980,864), (2870,7
 całkowitą słowa po zakodowaniu, a *k* to liczba bitów informacyjnych - nadmiarowość liczymy jako iloraz *n/k*, jest to oczywiście
 stała wartość dla danego kodowania. Badaliśmy wiadomości o długości 1 000 000 bitów, znów generując po dziesięć
 losowych ciągów i uśredniając BER widoczny na wykresach.
-   
+
+
+
 
 1. prawie idealny: `1-k = 0.000001`,  `p = 0.000101648`,  `1-h = 0.31`, `r = 0.914789`
 
@@ -480,19 +588,9 @@ losowych ciągów i uśredniając BER widoczny na wykresach.
 
 ##### Zależność BER od długości wiadomości
 
-W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy, tym lepszy), pozioma natomiast oznacza długość wiadomości - 
-liczbę bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, 
-które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** 
-kodowanie BCH zachowuje wynik, potrojeniowe staje się dużo gorsze, jednak nadal dwukrotnie lepsze od Hamminga. 
-W **kanale niezłym** oraz **średnim** BER kodowania potrojeniowego coraz bardziej zbliża się do współczynnika błędu kodu Hamminga, 
-przy czym próbka zakodowana kanałem BCH stale jest bezbłędnie odkodowywana. Dopiero w **kanale złym** kodowanie potrojeniowe 
-i Hamminga dają podobne rezultaty, a w kodowaniu BCH pojawia się BER nieznacznie mniejszy od konkurencyjnych kanałów. 
-W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH nadal ma nad nimi przewagę.
+W każdym wykresie oś pionowa charakteryzuje BER - Bit Error Rate (im mniejszy, tym lepszy), pozioma natomiast oznacza długość wiadomości - liczbę bitów w wygenerowanym ciągu. W **kanale prawie idealnym** kod potrojeniowy oraz BCH dają podobne rezultaty, z przewagą kodowania BCH, które spisało się idealnie, współczynnik błędu wynosi 0. Kodowanie Hamminga wyraźnie od nich odstaje. W przypadku **kanału dobrego** kodowanie BCH zachowuje wynik, potrojeniowe staje się dużo gorsze, jednak nadal dwukrotnie lepsze od Hamminga. W **kanale niezłym** oraz **średnim** BER kodowania potrojeniowego coraz bardziej zbliża się do współczynnika błędu kodu Hamminga, przy czym próbka zakodowana kanałem BCH stale jest bezbłędnie odkodowywana. Dopiero w **kanale złym** kodowanie potrojeniowe i Hamminga dają podobne rezultaty, a w kodowaniu BCH pojawia się BER nieznacznie mniejszy od konkurencyjnych kanałów. W **kanale fatalnym** kod Hamminga i potrojeniowy spisują się jednakowo, BCH nadal ma nad nimi przewagę.
 
-Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. 
-Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. 
-Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego 
-przy kodowaniu potrojeniowym czy też Hamminga.
+Najlepsze wyniki pod względem występującego współczynnika błędu, niezależnie od dobranych parametrów, zwraca kodowanie BCH. Wiadomość zostaje bezbłędnie odkodowana dla prawie idealnego kanału, dobrego, niezłego oraz średniego. Bit Error Rate jest różny od 0 dopiero w gorszych kanałach, jednak nadal jest mniejszy od współczynnika błędu występującego przy kodowaniu potrojeniowym czy też Hamminga.
 
 Warto też zauważyć, że rosnąca długość wiadomości nie wiązała się ze znaczącym wzrostem BER - niewielkich fluktuacji nie bierzemy pod uwagę.
 Pozwala to wnioskować, że dla danych parametrów kanału i danego kodowania BER jest funkcją w przybliżeniu stałą.

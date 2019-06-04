@@ -95,28 +95,24 @@ data = generator.generate_bits(864)
     # print(f'SUM length (enc): {lenSum}')
 
 # BCH_POLYNOMIAL = 8219
-# ------+--------------+-----------------+-----------------+-------------------------------------------+------------------------------------------
-# case  | BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_LENGTH  | ENCODED_BITS                              | n - k
-#       |              | (in packets)    | (ilosc podlist) | (srednio, im dalej tym wariancja wieksza) | (liczba pozycji kontrolnych)
-# ------+--------------+-----------------+-----------------+-------------------------------------------+-------------------------------------------
-# a)    | 10           | 1007            | 1024            | 1120                                      | 113
-# b)    | 50           | 942             | 1024            | 1510                                      | 568
-# c)    | 100          | 864             | 1027            | 1980                                      | 1116
-# d)    | 200          | 718             | 1043            | 2870                                      | 2006
-# e)    | 500          | 362             | 1175            | 5150                                      | 4788
-# f)    | 630          | 297             | 1321            | 5680                                      | 5383
-# ------+--------------+-----------------+-----------------+-------------------------------------------+------------------------------------------
+# ------+--------------+-----------------+-------------------------+-----------------------------#
+#       | BCH_BITS - t | MAX_DATA_LENGTH | ENCODED_BITS            | n - k                       #
+#       | zdolność     | w pojedynczym   | ilosc bitow             | liczba pozycji kontrolnych  #
+#       | korekcyjna   | pakiecie        | zakodowanej informacji  |                             #
+# ------+--------------+-----------------+-------------------------+-----------------------------#
+# a)    | 10           | 1007            | 1120                    | 113                         #
+# b)    | 50           | 942             | 1510                    | 568                         #
+# c)    | 100          | 864             | 1980                    | 1116                        #
+# d)    | 200          | 718             | 2870                    | 2006                        #
+# e)    | 500          | 362             | 5150                    | 4788                        #
+# f)    | 630          | 297             | 5680                    | 5383                        #
+# ------+--------------+-----------------+-------------------------+-----------------------------#
 
 # BCH_BITS - t, zdolnosc korekcji bledow, liczba bitow, ktore maksymalnie mozna naprawic
 # MAX_DATA_LENGTH - wiadomosc dzielimy na pakiety o maksymalnie tej dlugosci
 # ENCODED_LENGTH - ilosc podlist zakodowanego ciagu (useless)
 # ENCODED_BITS - ilosc bitow w zakodowanym ciagu wraz z ciagiem oryginalnym
 # n - k = ENCODED_BITS - MAX_DATA_LENGTH
-
-# wnioski
-#   - wzrost zdolnosci korekcyjnej (BCH_BITS, t) sprawia, ze mozemy operowac na coraz mniejszych pakietach, natomiast dlugosc zakodowanej informacji sie zwieksza.
-#     Prawdopodobnie rosnie skutecznosc kodowania kosztem nadmiarowosci - sprawdzic. Znalezc optymalne dane.
-#   - dla x podzialow k trzeba pomnozyc przez x - znacznie to zwiekszy nadmiarowosc, ale wynika to z ograniczen implementacji
 
 
 

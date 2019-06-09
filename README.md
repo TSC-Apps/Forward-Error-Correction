@@ -623,7 +623,7 @@ Warto też zauważyć, że rosnąca długość wiadomości nie wiązała się ze
 ##### Zestawienie nadmiarowości 
 W kanale prawie idealnym:
 
-- wszystkie kodowania BCH dają BER = 0. Jeżeli przyjmiemy próg BER rzędu 10^{-6}​, wymagania spełnia także kod potrojeniowy,
+- wszystkie kodowania BCH dają BER = 0. Jeżeli przyjmiemy próg BER rzędu 10<sup>-6</sup>, wymagania spełnia także kod potrojeniowy,
 - kodowanie Hamminga jest gorsze o rząd wielkości
 
 BER nie jest tutaj czynnikiem różnicującym wśród kodowań BCH. Najoptymalniejszym wyborem okazuje się najmniej nadmiarowe kodowanie BCH czyli (1120, 1007) z nadmiarowością około 1,1.
@@ -631,14 +631,14 @@ BER nie jest tutaj czynnikiem różnicującym wśród kodowań BCH. Najoptymalni
 W kanale dobrym:
 
 - wszystkie kodowania BCH są niezawodne z BER = 0,
-- kodowanie potrojeniowe i Hamminga oferują BER tego samego rzędu 10^-4 przy trzykrotnej nadmiarowości potrojeniowego i dwukrotnej Hamminga. Matematyczne zasady rządzące kodowaniem Hamminga zaczynają przeważać nad prostotą działania kodowania potrojeniowego.
+- kodowanie potrojeniowe i Hamminga oferują BER tego samego rzędu 10<sup>-4</sup> przy trzykrotnej nadmiarowości potrojeniowego i dwukrotnej Hamminga. Matematyczne zasady rządzące kodowaniem Hamminga zaczynają przeważać nad prostotą działania kodowania potrojeniowego.
 
 BER nie jest tutaj czynnikiem różnicującym, ponieważ wszystkie kodowania BCH są bezbłędne. Najoptymalniejszym wyborem okazuje się najmniej nadmiarowe kodowanie BCH czyli (1120, 1007). 
 
 W kanale niezłym:
 
-- w BCH pojawiają się pierwsze błędy (w wersji z najmniejszą nadmiarowością (1120, 1007) mamy BER rzędu 10^-4,
-- kodowanie Hamminga zbliża się do kodowania potrojeniowego (są rzędu 10^-3), dzieli je już minimalna różnica)
+- w BCH pojawiają się pierwsze błędy (w wersji z najmniejszą nadmiarowością (1120, 1007) mamy BER rzędu 10<sup>-4</sup>,
+- kodowanie Hamminga zbliża się do kodowania potrojeniowego (są rzędu 10<sup>-3</sup>), dzieli je już minimalna różnica)
 
 Wybór najoptymalniejszego kodowania jest już mniej oczywisty. Jeśli jest potrzeba przeprowadzenia bezbłędnej transmisji to najlepiej będzie zastosować kodowanie BCH(1510, 1024) o nadmiarowości ok. 1,5. W przypadku braku możliwości zastosowania tak nadmiarowego kodu lub kiedy, kluczowym czynnikiem jest szybkość transmisji, dobrym rozwiązaniem jest zastosowanie kodu BCH(1120, 1007) z nadmiarowością ok. 1,1, który przekłamuje mniej więcej 6 bitów na 10 000.
 
@@ -646,13 +646,13 @@ W kanale średnim:
 
 - kodowania BCH układają się w przybliżeniu w łukowaty kształt hiperboliczny,
 - kodowanie Hamminga jest coraz bliższe kodowaniu potrojeniowemu,
-- najmniej nadmiarowe kodowanie BCH(1120, 1007), które wybieraliśmy jako najoptymalniejsze w dwóch pierwszych kanałach, zaczęło mieć gorszy BER od kodowania potrojeniowego i Hamminga (rzędu 10^-2),
+- najmniej nadmiarowe kodowanie BCH(1120, 1007), które wybieraliśmy jako najoptymalniejsze w dwóch pierwszych kanałach, zaczęło mieć gorszy BER od kodowania potrojeniowego i Hamminga (rzędu 10<sup>-2</sup>),
 
-Przyjęcie maksymalnego BER = 10^-2 prowadzi do odrzucenia trzech kodowań i pozwala wybierać między pozostałymi trzema kodowaniami BCH. Jeśli najważniejszym czynnikiem jest szybkość transmisji, to dobrym wyborem okazuje się BCH(1510, 1024) z BER rzędu 10^-3 - 10^-4, zaś jeśli istnieje konieczność bezbłędnej transmisji, to należy wybrać BCH(1980, 864).
+Przyjęcie maksymalnego BER = 10<sup>-2</sup> prowadzi do odrzucenia trzech kodowań i pozwala wybierać między pozostałymi trzema kodowaniami BCH. Jeśli najważniejszym czynnikiem jest szybkość transmisji, to dobrym wyborem okazuje się BCH(1510, 1024) z BER rzędu 10<sup>-3</sup> - 10<sup>-4</sup>, zaś jeśli istnieje konieczność bezbłędnej transmisji, to należy wybrać BCH(1980, 864).
 
 W kanale złym:
 
-- żaden z badanych kodów nie jest w stanie skorygować wszystkich błędów, minimalny BER wynosi 0,1, wszystkie kodowania mają bardzo wysoki BER rzędu 10^-1,
+- żaden z badanych kodów nie jest w stanie skorygować wszystkich błędów, minimalny BER wynosi 0,1, wszystkie kodowania mają bardzo wysoki BER rzędu 10<sup>-1</sup>,
 - kodowanie Hamminga ma praktycznie identyczną zdolność korekcyjną co kodowanie potrojeniowe,
 - rodzina kodów BCH znów układa się w hiperboliczny kształt - większa nadmiarowość oznacza mniejszy BER, mniejsza nadmiarowość - większy,.
 - niewielkie różnice w BER oznaczają tutaj już spore różnice w bezwzględnej ilości przekłamanych bitów. Dla testowanego ciągu (1 000 000 bitów) 0,01 to 10 000 bitów.
@@ -661,7 +661,7 @@ W tak słabym kanale zdolność korekcyjna wszystkich kodowań jest tego samego 
 
 W kanale fatalnym:
 
-- rząd wielkości BER jest bardzo wysoki i wynosi 10^-1 - wartości oscylują wokół 50% błędnych bitów,
+- rząd wielkości BER jest bardzo wysoki i wynosi 10<sup>-1</sup> - wartości oscylują wokół 50% błędnych bitów,
 - kodowania potrojeniowe i Hamminga w stosunku do BCH radzą sobie gorzej niż w dwóch poprzednich kanałach.
 
 W fatalnym kanale kodowanie jest praktycznie bez znaczenia. W żadnym wypadku nie można uzyskać wiadomości nawet podobnej do oryginalnej. Zatem najlepiej wybrać najszybsze kodowanie - BCH(1120, 1007).

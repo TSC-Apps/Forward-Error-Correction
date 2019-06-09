@@ -39,8 +39,6 @@ Służą do zabezpieczenia danych przed błędami transmisji poprzez dołączeni
 
 
 
-
-
 W skład kodów nadmiarowych wchodzą:
 
 * **kody blokowe** - informacje podzielone są na bloki k-elementowe. Do każdego z nich dołączana jest sekwencja kontrolna,
@@ -346,6 +344,8 @@ else: # jestesmy w zlym stanie
 
 
 
+
+
 ### Narzędzia do analizy danych
 
 W projekcie skorzystano z biblioteki `matplotlib`.  Działa w sposób bardzo podobny do matlaba: należy ustalić zawartość osi x i y, ich etykietę, tytuł wykresu, etc np:
@@ -386,6 +386,12 @@ losowych ciągów i uśredniając BER widoczny na wykresach.
 
 
 
+
+
+
+
+
+
 1. prawie idealny: `1-k = 0.000001`,  `p = 0.000101648`,  `1-h = 0.31`, `r = 0.914789`
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(1e-06%2C%200.000101648%2C%200.31%2C%200.914789).png?raw=true)
@@ -394,11 +400,49 @@ losowych ciągów i uśredniając BER widoczny na wykresach.
 
    
 
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
+   
+
 2. dobry: `1-k = 0.000053513`, `p = 0.000196854`, `1-h =0.65`, `r = 0.509547`
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.000196854%2C%200.65%2C%200.509547).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(5.3513e-05,%200.000196854,%200.65,%200.509547).png?raw=true)
+
+   
+
+   
 
    
 
@@ -470,11 +514,19 @@ losowych ciągów i uśredniając BER widoczny na wykresach.
 
    
 
+   
+
+   
+
 4. średni: `1-k = 0.000053513`,  `p = 0.00496854`, `1-h = 0.9`, `r = 0.2768`
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(5.3513e-05%2C%200.00496854%2C%200.9%2C%200.2768).png?raw=true)
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(5.3513e-05,%200.00496854,%200.9,%200.2768).png?raw=true)
+
+   
+
+   
 
    
 
@@ -546,10 +598,14 @@ losowych ciągów i uśredniając BER widoczny na wykresach.
 
    
 
+   
+
+   
+
 6. fatalny: `1-k = 0.0003631513`, `p = 0.00496854`, `1-h = 0.99999`, `r = 0.004`
 
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/gilbert_ber_err_prob%3D(0.0003631513%2C%200.00496854%2C%200.99999%2C%200.004).png?raw=true)
-   
+
    ![](https://github.com/TSC-Apps/Forward-Error-Correction/blob/master/plots/dots/gilbert_ber_err_prob=(0.0003631513,%200.00496854,%200.99999,%200.004).png?raw=true)
 
 
